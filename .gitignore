@@ -1,0 +1,36 @@
+# Environment & secrets
+.env
+.env.*
+!frontend/.env        # frontend .env is safe (no real secrets)
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+.pytest_cache/
+.mypy_cache/
+
+# Data files (too large for git)
+data/
+*.jsonl
+*.jsonl.gz
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code internals
+.agents/
+.claude/
+skills-lock.json
