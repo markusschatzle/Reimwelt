@@ -1,6 +1,18 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { InfoIcon } from "./_widgets.jsx";
+import { InfoIcon, WissenToc } from "./_widgets.jsx";
+
+// Table-of-contents entries — `id` matches the matching <h2 id> below.
+const SECTIONS = [
+  { id: "was-ist-ipa", label: "Was ist das IPA?" },
+  { id: "warum-ipa", label: "Warum Reimwelt IPA nutzt" },
+  { id: "wo-ipa", label: "Wo du IPA siehst" },
+  { id: "kurzvokale", label: "Kurzvokalische Laute" },
+  { id: "langvokale", label: "Langvokalische Laute" },
+  { id: "diphthonge", label: "Diphthonge" },
+  { id: "konsonanten", label: "Wichtige Konsonanten" },
+  { id: "variation", label: "Viele Aussprachen" },
+];
 
 // ---------------------------------------------------------------------------
 // IPA symbol tables
@@ -112,197 +124,202 @@ function IpaTable({ rows }) {
 
 export default function IpaPage() {
   return (
-    <div className="wissen-page">
-      <header className="wissen-hero">
-        <Link to="/wissenswelt" className="wissen-breadcrumb">
-          ← Wissenswelt
-        </Link>
-        <span className="wissen-kicker">Wissenswelt · Aussprache</span>
-        <h1>IPA – Lautschrift</h1>
-        <p className="wissen-lead">
-          Das Internationale Phonetische Alphabet: ein Zeichensatz, der
-          aufschreibt, was dein Mund tatsächlich tut – und nicht, was die
-          Rechtschreibung gern hätte.
+    <div className="wissen-layout">
+      <WissenToc sections={SECTIONS} />
+      <div className="wissen-page">
+        <header className="wissen-hero">
+          <Link to="/wissenswelt" className="wissen-breadcrumb">
+            ← Wissenswelt
+          </Link>
+          <span className="wissen-kicker">Wissenswelt · Aussprache</span>
+          <h1>IPA – Lautschrift</h1>
+          <p className="wissen-lead">
+            Das Internationale Phonetische Alphabet: ein Zeichensatz, der
+            aufschreibt, was dein Mund tatsächlich tut – und nicht, was die
+            Rechtschreibung gern hätte.
+          </p>
+        </header>
+
+        {/* ── Was ist IPA? ── */}
+        <h2 id="was-ist-ipa">Was ist das IPA?</h2>
+        <p>
+          Das <strong>Internationale Phonetische Alphabet</strong> (IPA) ist ein
+          standardisiertes Zeichensystem, mit dem sich die Aussprache jeder
+          Sprache der Welt eindeutig aufschreiben lässt. Im Gegensatz zur
+          normalen Orthographie, die sich in vielen Sprachen weit von der
+          tatsächlichen Aussprache entfernt hat, bildet IPA konsequent{" "}
+          <strong>Laute</strong> ab – ein Symbol, ein Laut.
         </p>
-      </header>
-
-      {/* ── Was ist IPA? ── */}
-      <h2>Was ist das IPA?</h2>
-      <p>
-        Das <strong>Internationale Phonetische Alphabet</strong> (IPA) ist ein
-        standardisiertes Zeichensystem, mit dem sich die Aussprache jeder
-        Sprache der Welt eindeutig aufschreiben lässt. Im Gegensatz zur normalen
-        Orthographie, die sich in vielen Sprachen weit von der tatsächlichen
-        Aussprache entfernt hat, bildet IPA konsequent <strong>Laute</strong> ab
-        – ein Symbol, ein Laut.
-      </p>
-      <p>
-        IPA-Transkriptionen stehen üblicherweise in eckigen Klammern:{" "}
-        <span
-          style={{ fontFamily: "var(--font-mono)", color: "var(--accent)" }}
-        >
-          [ˈhaʊ̯s]
-        </span>{" "}
-        für <em>Haus</em>. Ein kleines Häkchen{" "}
-        <span
-          style={{ fontFamily: "var(--font-mono)", color: "var(--accent)" }}
-        >
-          ˈ
-        </span>{" "}
-        vor einer Silbe zeigt an, dass diese betont wird.
-      </p>
-
-      {/* ── Warum Reimwelt IPA nutzt ── */}
-      <h2>Warum Reimwelt IPA nutzt</h2>
-      <p>
-        Reimwelt vergleicht Wörter nicht auf Buchstabenebene, sondern direkt auf
-        Lautebene. Das ist notwendig, weil die deutsche Orthographie (wie die
-        meisten Sprachen) keine 1:1-Beziehung zwischen Schreibung und Klang hat:
-      </p>
-      <ul>
-        <li>
-          <em>„viel"</em> und <em>„Stil"</em> reimen sich, obwohl sie
-          unterschiedlich enden (<em>-iel</em> vs. <em>-il</em>).
-        </li>
-        <li>
-          <em>„Regen"</em> und <em>„legen"</em> reimen, während <em>„Regen"</em>{" "}
-          und <em>„gegen"</em> ebenfalls reimen – das zeigt IPA sofort: alle
-          enden auf{" "}
+        <p>
+          IPA-Transkriptionen stehen üblicherweise in eckigen Klammern:{" "}
           <span
             style={{ fontFamily: "var(--font-mono)", color: "var(--accent)" }}
           >
-            -eːɡən
-          </span>
-          .
-        </li>
-        <li>
-          Bei sprachübergreifenden Reimen wäre ein Buchstabenvergleich
-          unmöglich: <em>„Eier"</em> (de) und <em>„fire"</em> (en) reimen sich,
-          aber nur IPA macht das sichtbar.
-        </li>
-      </ul>
-
-      {/* ── Wo IPA erscheint ── */}
-      <h2>Wo du IPA in Reimwelt siehst</h2>
-      <ul>
-        <li>
-          <strong>Suchleiste:</strong> Während du tippst, erscheint rechts die
-          IPA-Transkription des eingegebenen Wortes.
-        </li>
-        <li>
-          <strong>Detailpanel:</strong> Klickst du auf das <InfoIcon />
-          -Symbol bei einem Treffer, siehst du die vollständige IPA-Schreibung
-          inkl. Betonung.
-        </li>
-        <li>
-          <strong>Reimteil:</strong> In den Suchergebnissen ist der Reimteil
-          (der übereinstimmende Lautabschnitt) farblich hervorgehoben.
-        </li>
-      </ul>
-
-      {/* ── Tabellen ── */}
-      <h2>Kurzvokalische Laute</h2>
-      <IpaTable rows={VOKALE_KURZ} />
-
-      <h2>Langvokalische Laute</h2>
-      <IpaTable rows={VOKALE_LANG} />
-
-      <h2>Diphthonge</h2>
-      <p>
-        Diphthonge sind Doppelvokale – zwei Vokallaute, die innerhalb einer
-        Silbe ineinandergleitend gesprochen werden.
-      </p>
-      <IpaTable rows={DIPHTHONGE} />
-
-      <h2>Wichtige Konsonanten</h2>
-      <p>
-        Die meisten deutschen Konsonanten entsprechen dem lateinischen Alphabet.
-        Diese Sondersymbole treten häufig auf und unterscheiden sich von der
-        Schreibung:
-      </p>
-      <IpaTable rows={KONSONANTEN} />
-
-      {/* ── Variation ── */}
-      <h2>Eine Schreibung, viele Aussprachen</h2>
-      <p>
-        Hier wird es kniffflig: <em>Die eine</em> richtige Aussprache gibt es
-        oft gar nicht.
-      </p>
-      <p>
-        Wie ein Wort klingt, hängt von Dialekt, Region, Akzent und sogar der
-        Sprechsituation ab. Reimwelt kann pro Wort aber nur{" "}
-        <strong>eine</strong> IPA-Transkription speichern – in der Regel die
-        überregionale Standardlautung. Dein Sprachgefühl darf davon abweichen.
-      </p>
-      <p>
-        Das Paradebeispiel ist die Endung <em>-ig</em>. In der Standardlautung
-        wird sie als ich-Laut <span className="ipa-symbol">[ɪç]</span>{" "}
-        gesprochen – dann reimt <em>lustig</em> sauber auf <em>möglich</em>:
-      </p>
-      <div className="wissen-examples">
-        <div className="wissen-example-row">
-          <span className="wissen-example-word">
-            lustig
-            <span className="wissen-example-tag">Standard</span>
-          </span>
-          <span className="wissen-example-ipa">[ˈlʊstɪç]</span>
-          <span className="wissen-example-gloss">
-            reimt auf möglich [ˈmøːklɪç]
-          </span>
-        </div>
-        <div className="wissen-example-row">
-          <span className="wissen-example-word">
-            lustig
-            <span className="wissen-example-tag">süddt. / öster.</span>
-          </span>
-          <span className="wissen-example-ipa">[ˈlʊstɪk]</span>
-          <span className="wissen-example-gloss">
-            mit hartem g – reimt <em>nicht</em> auf möglich
-          </span>
-        </div>
-      </div>
-      <p>
-        Spricht jemand das <em>g</em> hingegen hart aus –{" "}
-        <span className="ipa-symbol">[ˈlʊstɪk]</span>, wie in weiten Teilen
-        Süddeutschlands, Österreichs und der Schweiz –, ist der Reim auf{" "}
-        <em>möglich</em> dahin. Beide Aussprachen sind völlig korrekt; sie
-        führen nur zu verschiedenen Reimen. Genau diese Vielstimmigkeit ist eine
-        der größten Hürden, die eine algorithmische Reimsuche grundsätzlich
-        nicht auflösen kann: Sie muss sich für eine Lesart entscheiden – und
-        liegt damit für einen Teil der Sprecher zwangsläufig daneben.
-      </p>
-
-      {/* ── Tipp ── */}
-      <div className="wissen-callout">
-        <p>
-          <strong>Tipp:</strong> Wenn ein Reimvorschlag seltsam aussieht,
-          überprüfe die IPA im Detailpanel. Stimmt die Transkription nicht mit
-          deiner Aussprache überein, könnte es sich um einen{" "}
-          <Link to="/wissenswelt/homographe">Homographen</Link> oder einen
-          automatisch generierten IPA-Fehler handeln.
+            [ˈhaʊ̯s]
+          </span>{" "}
+          für <em>Haus</em>. Ein kleines Häkchen{" "}
+          <span
+            style={{ fontFamily: "var(--font-mono)", color: "var(--accent)" }}
+          >
+            ˈ
+          </span>{" "}
+          vor einer Silbe zeigt an, dass diese betont wird.
         </p>
-      </div>
 
-      {/* ── CTA ── */}
-      <div className="wissen-cta-row">
-        <Link to="/reime" className="wissen-cta-btn">
-          Reime suchen →
-        </Link>
-      </div>
+        {/* ── Warum Reimwelt IPA nutzt ── */}
+        <h2 id="warum-ipa">Warum Reimwelt IPA nutzt</h2>
+        <p>
+          Reimwelt vergleicht Wörter nicht auf Buchstabenebene, sondern direkt
+          auf Lautebene. Das ist notwendig, weil die deutsche Orthographie (wie
+          die meisten Sprachen) keine 1:1-Beziehung zwischen Schreibung und
+          Klang hat:
+        </p>
+        <ul>
+          <li>
+            <em>„viel"</em> und <em>„Stil"</em> reimen sich, obwohl sie
+            unterschiedlich enden (<em>-iel</em> vs. <em>-il</em>).
+          </li>
+          <li>
+            <em>„Regen"</em> und <em>„legen"</em> reimen, während{" "}
+            <em>„Regen"</em> und <em>„gegen"</em> ebenfalls reimen – das zeigt
+            IPA sofort: alle enden auf{" "}
+            <span
+              style={{ fontFamily: "var(--font-mono)", color: "var(--accent)" }}
+            >
+              -eːɡən
+            </span>
+            .
+          </li>
+          <li>
+            Bei sprachübergreifenden Reimen wäre ein Buchstabenvergleich
+            unmöglich: <em>„Eier"</em> (de) und <em>„fire"</em> (en) reimen
+            sich, aber nur IPA macht das sichtbar.
+          </li>
+        </ul>
 
-      {/* ── Siehe auch ── */}
-      <div className="wissen-also">
-        <p className="wissen-also-title">Siehe auch</p>
-        <div className="wissen-also-links">
-          <Link to="/wissenswelt/homographe" className="wissen-also-link">
-            🔤 Homographe
+        {/* ── Wo IPA erscheint ── */}
+        <h2 id="wo-ipa">Wo du IPA in Reimwelt siehst</h2>
+        <ul>
+          <li>
+            <strong>Suchleiste:</strong> Während du tippst, erscheint rechts die
+            IPA-Transkription des eingegebenen Wortes.
+          </li>
+          <li>
+            <strong>Detailpanel:</strong> Klickst du auf das <InfoIcon />
+            -Symbol bei einem Treffer, siehst du die vollständige IPA-Schreibung
+            inkl. Betonung.
+          </li>
+          <li>
+            <strong>Reimteil:</strong> In den Suchergebnissen ist der Reimteil
+            (der übereinstimmende Lautabschnitt) farblich hervorgehoben.
+          </li>
+        </ul>
+
+        {/* ── Tabellen ── */}
+        <h2 id="kurzvokale">Kurzvokalische Laute</h2>
+        <IpaTable rows={VOKALE_KURZ} />
+
+        <h2 id="langvokale">Langvokalische Laute</h2>
+        <IpaTable rows={VOKALE_LANG} />
+
+        <h2 id="diphthonge">Diphthonge</h2>
+        <p>
+          Diphthonge sind Doppelvokale – zwei Vokallaute, die innerhalb einer
+          Silbe ineinandergleitend gesprochen werden.
+        </p>
+        <IpaTable rows={DIPHTHONGE} />
+
+        <h2 id="konsonanten">Wichtige Konsonanten</h2>
+        <p>
+          Die meisten deutschen Konsonanten entsprechen dem lateinischen
+          Alphabet. Diese Sondersymbole treten häufig auf und unterscheiden sich
+          von der Schreibung:
+        </p>
+        <IpaTable rows={KONSONANTEN} />
+
+        {/* ── Variation ── */}
+        <h2 id="variation">Eine Schreibweise, viele Aussprachen</h2>
+        <p>
+          Hier wird es kniffflig: <em>Die eine</em> richtige Aussprache gibt es
+          oft gar nicht.
+        </p>
+        <p>
+          Wie ein Wort klingt, hängt von Dialekt, Region, Akzent und sogar der
+          Sprechsituation ab. Reimwelt kann pro Wort aber nur{" "}
+          <strong>eine</strong> IPA-Transkription speichern – in der Regel die
+          überregionale Standardlautung. Dein Sprachgefühl darf davon abweichen.
+        </p>
+        <p>
+          Das Paradebeispiel ist die Endung <em>-ig</em>. In der Standardlautung
+          wird sie als ich-Laut <span className="ipa-symbol">[ɪç]</span>{" "}
+          gesprochen – dann reimt <em>lustig</em> sauber auf <em>möglich</em>:
+        </p>
+        <div className="wissen-examples">
+          <div className="wissen-example-row">
+            <span className="wissen-example-word">
+              lustig
+              <span className="wissen-example-tag">Standard</span>
+            </span>
+            <span className="wissen-example-ipa">[ˈlʊstɪç]</span>
+            <span className="wissen-example-gloss">
+              reimt auf möglich [ˈmøːklɪç]
+            </span>
+          </div>
+          <div className="wissen-example-row">
+            <span className="wissen-example-word">
+              lustig
+              <span className="wissen-example-tag">süddt. / öster.</span>
+            </span>
+            <span className="wissen-example-ipa">[ˈlʊstɪk]</span>
+            <span className="wissen-example-gloss">
+              mit hartem g – reimt <em>nicht</em> auf möglich
+            </span>
+          </div>
+        </div>
+        <p>
+          Spricht jemand das <em>g</em> hingegen hart aus –{" "}
+          <span className="ipa-symbol">[ˈlʊstɪk]</span>, wie in weiten Teilen
+          Süddeutschlands, Österreichs und der Schweiz –, ist der Reim auf{" "}
+          <em>möglich</em> dahin. Beide Aussprachen sind völlig korrekt; sie
+          führen nur zu verschiedenen Reimen. Genau diese Vielstimmigkeit ist
+          eine der größten Hürden, die eine algorithmische Reimsuche
+          grundsätzlich nicht auflösen kann: Sie muss sich für eine Lesart
+          entscheiden – und liegt damit für einen Teil der Sprecher zwangsläufig
+          daneben.
+        </p>
+
+        {/* ── Tipp ── */}
+        <div className="wissen-callout">
+          <p>
+            <strong>Tipp:</strong> Wenn ein Reimvorschlag seltsam aussieht,
+            überprüfe die IPA im Detailpanel. Stimmt die Transkription nicht mit
+            deiner Aussprache überein, könnte es sich um einen{" "}
+            <Link to="/wissenswelt/homographe">Homographen</Link> oder einen
+            automatisch generierten IPA-Fehler handeln.
+          </p>
+        </div>
+
+        {/* ── CTA ── */}
+        <div className="wissen-cta-row">
+          <Link to="/reime" className="wissen-cta-btn">
+            Reime suchen →
           </Link>
-          <Link to="/wissenswelt/metrum" className="wissen-also-link">
-            🎼 Metrum &amp; Rhythmus
-          </Link>
-          <Link to="/wissenswelt" className="wissen-also-link">
-            ← Wissenswelt
-          </Link>
+        </div>
+
+        {/* ── Siehe auch ── */}
+        <div className="wissen-also">
+          <p className="wissen-also-title">Siehe auch</p>
+          <div className="wissen-also-links">
+            <Link to="/wissenswelt/homographe" className="wissen-also-link">
+              🔤 Homographe
+            </Link>
+            <Link to="/wissenswelt/metrum" className="wissen-also-link">
+              🎼 Metrum &amp; Rhythmus
+            </Link>
+            <Link to="/wissenswelt" className="wissen-also-link">
+              ← Wissenswelt
+            </Link>
+          </div>
         </div>
       </div>
     </div>

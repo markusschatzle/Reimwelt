@@ -1,6 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { MeterDots, InfoIcon } from "./_widgets.jsx";
+import { MeterDots, InfoIcon, WissenToc } from "./_widgets.jsx";
+
+// Table-of-contents entries — `id` matches the matching <h2 id> below.
+const SECTIONS = [
+  { id: "was-ist-metrum", label: "Was ist Metrum?" },
+  { id: "vier-versfuesse", label: "Die vier Versfüße" },
+  { id: "weitere-versfuesse", label: "Weitere Versfüße" },
+  { id: "detailpanel", label: "Metrum im Detailpanel" },
+];
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -227,98 +235,103 @@ function UncommonTable() {
 
 export default function MetrumPage() {
   return (
-    <div className="wissen-page">
-      <header className="wissen-hero">
-        <Link to="/wissenswelt" className="wissen-breadcrumb">
-          ← Wissenswelt
-        </Link>
-        <span className="wissen-kicker">Wissenswelt · Betonung</span>
-        <h1>Metrum &amp; Rhythmus</h1>
-        <p className="wissen-lead">
-          Der Herzschlag der Sprache: vier klassische Versfüße, mit Punkten
-          zerlegt und an echten Versen von Goethe bis Schiller vorgeführt.
-        </p>
-      </header>
-
-      {/* ── Was ist Metrum? ── */}
-      <h2>Was ist Metrum?</h2>
-      <p>
-        Das <strong>Metrum</strong> (auch: Versmaß) ist das regelmäßige
-        Betonungsmuster eines Verses oder Songtexts.
-      </p>
-      <p>
-        Es entsteht durch die Abfolge von <strong>betonten</strong> und{" "}
-        <strong>unbetonten</strong> Silben – in Reimwelt dargestellt als{" "}
-        <MeterDots pattern="10" label="betont, unbetont" /> gefüllte und leere
-        Kreise. Die kleinste rhythmische Einheit heißt <strong>Versfuß</strong>;
-        reiht man mehrere aneinander, ergibt sich ein vollständiger Vers. Vier
-        Jamben hintereinander heißen etwa „vierhebiger Jambus" – das Maß von
-        Shakespeares Sonetten und Schillers Balladen.
-      </p>
-      <p>
-        Reimwelt erkennt das Metrum jedes Wortes automatisch aus seinem
-        Betonungsmuster und zeigt es im Detailpanel an. Über den Filter in der
-        Suchleiste kannst du Ergebnisse auf ein bestimmtes Versmaß einschränken.
-      </p>
-
-      {/* ── Vier Versfüße ── */}
-      <h2>Die vier klassischen Versfüße</h2>
-      <p>
-        Betonte Silben sind{" "}
-        <span className="verse-syl--stress">farblich hervorgehoben</span>,
-        unbetonte bleiben grau. Die Beispiele sind echte Verszeilen – lies sie
-        laut und klopf den Takt mit.
-      </p>
-
-      {FEET.map((foot) => (
-        <FootCard key={foot.name} {...foot} />
-      ))}
-
-      {/* ── Seltene Versfüße ── */}
-      <h2>Weitere Versfüße in Reimwelt</h2>
-      <p>
-        Reimwelt erkennt noch sechs weitere Betonungsmuster. Sie treten seltener
-        auf als die großen Vier, tauchen aber in der Datenbank auf und können im
-        Metrum-Filter ausgewählt werden.
-      </p>
-      <UncommonTable />
-
-      {/* ── Metrum in Reimwelt ── */}
-      <h2>Metrum im Detailpanel</h2>
-      <p>
-        Im <strong>Detailpanel</strong> jedes Wortes – ein Klick auf das{" "}
-        <InfoIcon /> -Symbol bei einem Treffer – siehst du das Betonungsmuster
-        als dieselben Kreise:{" "}
-        <MeterDots pattern="010" label="unbetont, betont, unbetont" /> steht zum
-        Beispiel für ein Wort wie <em>„Geliebte"</em>. Daraus lässt sich direkt
-        ablesen, welchem Versfuß das Wort entspricht.
-      </p>
-      <p>
-        Im <strong>Metrum-Filter</strong> der Suchoberfläche kannst du
-        Ergebnisse auf einen bestimmten Versfuß einschränken – zum Beispiel nur
-        Trochäen oder nur dreisilbige Daktylen.
-      </p>
-
-      {/* ── CTA ── */}
-      <div className="wissen-cta-row">
-        <Link to="/reime" className="wissen-cta-btn">
-          Reime nach Metrum filtern →
-        </Link>
-      </div>
-
-      {/* ── Siehe auch ── */}
-      <div className="wissen-also">
-        <p className="wissen-also-title">Siehe auch</p>
-        <div className="wissen-also-links">
-          <Link to="/wissenswelt/reimen" className="wissen-also-link">
-            🎵 Was ist ein Reim?
-          </Link>
-          <Link to="/wissenswelt/ipa" className="wissen-also-link">
-            🔊 IPA – Lautschrift
-          </Link>
-          <Link to="/wissenswelt" className="wissen-also-link">
+    <div className="wissen-layout">
+      <WissenToc sections={SECTIONS} />
+      <div className="wissen-page">
+        <header className="wissen-hero">
+          <Link to="/wissenswelt" className="wissen-breadcrumb">
             ← Wissenswelt
           </Link>
+          <span className="wissen-kicker">Wissenswelt · Betonung</span>
+          <h1>Metrum &amp; Rhythmus</h1>
+          <p className="wissen-lead">
+            Der Herzschlag der Sprache: vier klassische Versfüße, mit Punkten
+            zerlegt und an echten Versen von Goethe bis Schiller vorgeführt.
+          </p>
+        </header>
+
+        {/* ── Was ist Metrum? ── */}
+        <h2 id="was-ist-metrum">Was ist Metrum?</h2>
+        <p>
+          Das <strong>Metrum</strong> (auch: Versmaß) ist das regelmäßige
+          Betonungsmuster eines Verses oder Songtexts.
+        </p>
+        <p>
+          Es entsteht durch die Abfolge von <strong>betonten</strong> und{" "}
+          <strong>unbetonten</strong> Silben – in Reimwelt dargestellt als{" "}
+          <MeterDots pattern="10" label="betont, unbetont" /> gefüllte und leere
+          Kreise. Die kleinste rhythmische Einheit heißt{" "}
+          <strong>Versfuß</strong>; reiht man mehrere aneinander, ergibt sich
+          ein vollständiger Vers. Vier Jamben hintereinander heißen etwa
+          „vierhebiger Jambus" – das Maß von Shakespeares Sonetten und Schillers
+          Balladen.
+        </p>
+        <p>
+          Reimwelt erkennt das Metrum jedes Wortes automatisch aus seinem
+          Betonungsmuster und zeigt es im Detailpanel an. Über den Filter in der
+          Suchleiste kannst du Ergebnisse auf ein bestimmtes Versmaß
+          einschränken.
+        </p>
+
+        {/* ── Vier Versfüße ── */}
+        <h2 id="vier-versfuesse">Die vier klassischen Versfüße</h2>
+        <p>
+          Betonte Silben sind{" "}
+          <span className="verse-syl--stress">farblich hervorgehoben</span>,
+          unbetonte bleiben grau. Die Beispiele sind echte Verszeilen – lies sie
+          laut und klopf den Takt mit.
+        </p>
+
+        {FEET.map((foot) => (
+          <FootCard key={foot.name} {...foot} />
+        ))}
+
+        {/* ── Seltene Versfüße ── */}
+        <h2 id="weitere-versfuesse">Weitere Versfüße in Reimwelt</h2>
+        <p>
+          Reimwelt erkennt noch sechs weitere Betonungsmuster. Sie treten
+          seltener auf als die großen Vier, tauchen aber in der Datenbank auf
+          und können im Metrum-Filter ausgewählt werden.
+        </p>
+        <UncommonTable />
+
+        {/* ── Metrum in Reimwelt ── */}
+        <h2 id="detailpanel">Metrum im Detailpanel</h2>
+        <p>
+          Im <strong>Detailpanel</strong> jedes Wortes – ein Klick auf das{" "}
+          <InfoIcon /> -Symbol bei einem Treffer – siehst du das Betonungsmuster
+          als dieselben Kreise:{" "}
+          <MeterDots pattern="010" label="unbetont, betont, unbetont" /> steht
+          zum Beispiel für ein Wort wie <em>„Geliebte"</em>. Daraus lässt sich
+          direkt ablesen, welchem Versfuß das Wort entspricht.
+        </p>
+        <p>
+          Im <strong>Metrum-Filter</strong> der Suchoberfläche kannst du
+          Ergebnisse auf einen bestimmten Versfuß einschränken – zum Beispiel
+          nur Trochäen oder nur dreisilbige Daktylen.
+        </p>
+
+        {/* ── CTA ── */}
+        <div className="wissen-cta-row">
+          <Link to="/reime" className="wissen-cta-btn">
+            Reime nach Metrum filtern →
+          </Link>
+        </div>
+
+        {/* ── Siehe auch ── */}
+        <div className="wissen-also">
+          <p className="wissen-also-title">Siehe auch</p>
+          <div className="wissen-also-links">
+            <Link to="/wissenswelt/reimen" className="wissen-also-link">
+              🎵 Was ist ein Reim?
+            </Link>
+            <Link to="/wissenswelt/ipa" className="wissen-also-link">
+              🔊 IPA – Lautschrift
+            </Link>
+            <Link to="/wissenswelt" className="wissen-also-link">
+              ← Wissenswelt
+            </Link>
+          </div>
         </div>
       </div>
     </div>

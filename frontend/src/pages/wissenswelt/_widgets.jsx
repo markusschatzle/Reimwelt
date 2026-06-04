@@ -1,8 +1,74 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // Shared Wissenswelt widgets
 // ---------------------------------------------------------------------------
+
+// Sticky table of contents. `sections` is an ordered list of
+// { id, label } — `id` must match the `id` attribute on the matching
+// section heading. A scroll-spy (IntersectionObserver) highlights the
+// section currently in view. Numbers mirror the page's `01 02 …` counter.
+export function WissenToc({ sections, label = "Auf dieser Seite" }) {
+  const [activeId, setActiveId] = useState(sections[0]?.id ?? null);
+
+  useEffect(() => {
+    const headings = sections
+      .map((s) => document.getElementById(s.id))
+      .filter(Boolean);
+    if (headings.length === 0) return undefined;
+
+    // A heading counts as "active" while it sits in a band just below the
+    // sticky header. When several are in the band, the topmost wins; when
+    // none are, we keep the last active one rather than clearing it.
+    const visible = new Map();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            visible.set(entry.target.id, entry.boundingClientRect.top);
+          } else {
+            visible.delete(entry.target.id);
+          }
+        }
+        if (visible.size > 0) {
+          const [topId] = [...visible.entries()].sort((a, b) => a[1] - b[1])[0];
+          setActiveId(topId);
+        }
+      },
+      { rootMargin: "-80px 0px -65% 0px" },
+    );
+
+    headings.forEach((h) => observer.observe(h));
+    return () => observer.disconnect();
+  }, [sections]);
+
+  return (
+    <nav className="wissen-toc" aria-label="Inhaltsverzeichnis">
+      <div className="wissen-toc-inner">
+        <p className="wissen-toc-label">{label}</p>
+        <ul className="wissen-toc-list">
+          {sections.map((s, i) => {
+            const isActive = s.id === activeId;
+            return (
+              <li key={s.id} className="wissen-toc-item">
+                <a
+                  href={`#${s.id}`}
+                  className="wissen-toc-link"
+                  aria-current={isActive ? "true" : undefined}
+                >
+                  <span className="wissen-toc-num" aria-hidden="true">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="wissen-toc-text">{s.label}</span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </nav>
+  );
+}
 
 // Circled-i glyph — the same icon used on the result cards (WordChip).
 export function InfoIcon() {

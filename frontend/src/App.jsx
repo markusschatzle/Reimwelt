@@ -1,5 +1,13 @@
 ﻿import React, { useEffect, useRef, useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [pathname]);
+  return null;
+}
 import "./styles.css";
 
 import { ThemeProvider } from "./ThemeContext.jsx";
@@ -92,6 +100,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <>
+        <ScrollToTop />
         <Header />
         <main className="main-content" ref={mainRef}>
           <Routes>
