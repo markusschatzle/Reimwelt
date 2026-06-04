@@ -1,117 +1,155 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { MeterDots, InfoIcon } from "./_widgets.jsx";
+
+// One reading of a homograph: word + reading label, IPA, meter dots, gloss.
+function Reading({ word, tag, ipa, pattern, gloss }) {
+  return (
+    <div className="wissen-example-row">
+      <span className="wissen-example-word">
+        {word}
+        <span className="wissen-example-tag">{tag}</span>
+      </span>
+      <span className="wissen-example-ipa">{ipa}</span>
+      <span className="wissen-example-meter">
+        <MeterDots pattern={pattern} label={`${word} (${tag})`} />
+      </span>
+      <span className="wissen-example-gloss">{gloss}</span>
+    </div>
+  );
+}
 
 export default function HomographePage() {
   return (
     <div className="wissen-page">
-      <Link to="/wissenswelt" className="wissen-breadcrumb">
-        ← Wissenswelt
-      </Link>
-
-      <h1>Homographe</h1>
-      <p className="wissen-subtitle">
-        Gleiche Schreibung, verschiedene Aussprache – und warum das die
-        Reimsuche vor echte Probleme stellt.
-      </p>
+      <header className="wissen-hero">
+        <Link to="/wissenswelt" className="wissen-breadcrumb">
+          ← Wissenswelt
+        </Link>
+        <span className="wissen-kicker">Wissenswelt · Stolpersteine</span>
+        <h1>Homographe</h1>
+        <p className="wissen-lead">
+          Ein Wort, zwei Aussprachen: die linguistischen Doppelgänger, die
+          gleich aussehen, aber verschieden klingen – und der Reimsuche damit
+          gehörig auf der Nase herumtanzen.
+        </p>
+      </header>
 
       {/* ── Definition ── */}
       <h2>Was sind Homographe?</h2>
       <p>
-        Als <strong>Homographe</strong> bezeichnet man Wörter, die identisch
-        geschrieben werden, aber je nach Bedeutung oder Wortart unterschiedlich
-        ausgesprochen werden. Der Unterschied liegt oft in der{" "}
-        <strong>Betonung</strong>: Ein anderer Akzent verschiebt den Reimteil
-        und verändert damit, welche anderen Wörter als Reim infrage kommen.
+        Homographe sind Wörter, die identisch geschrieben, aber je nach
+        Bedeutung verschieden ausgesprochen werden.
+      </p>
+      <p>
+        Der Unterschied liegt oft in der <strong>Betonung</strong>: Ein anderer
+        Akzent verschiebt den Reimteil – und damit die komplette Liste an
+        Wörtern, die als Reim infrage kommen. Im Schriftbild ist davon nichts zu
+        sehen; man hört es erst, wenn man genau hinhört (oder die Kreise unten
+        vergleicht).
       </p>
 
       {/* ── Beispiele ── */}
       <h2>Beispiele aus dem Deutschen</h2>
+      <p>
+        Gefüllter Kreis = betonte Silbe. Schon ein verschobener Punkt schickt
+        die beiden Lesarten in völlig verschiedene Reimgruppen.
+      </p>
 
       <h3>modern</h3>
       <div className="wissen-examples">
-        <div className="wissen-example-row">
-          <span className="wissen-example-word">modern (Adj.)</span>
-          <span className="wissen-example-ipa">[moˈdɛʁn]</span>
-          <span className="wissen-example-gloss">zeitgemäß, aktuell</span>
-        </div>
-        <div className="wissen-example-row">
-          <span className="wissen-example-word">modern (Verb)</span>
-          <span className="wissen-example-ipa">[ˈmoːdɐn]</span>
-          <span className="wissen-example-gloss">verwesen, verrotten</span>
-        </div>
+        <Reading
+          word="modern"
+          tag="Adjektiv"
+          ipa="[moˈdɛʁn]"
+          pattern="01"
+          gloss="zeitgemäß, aktuell"
+        />
+        <Reading
+          word="modern"
+          tag="Verb"
+          ipa="[ˈmoːdɐn]"
+          pattern="10"
+          gloss="verwesen, verrotten"
+        />
       </div>
       <p>
-        Als Adjektiv betont auf der zweiten Silbe: Reimteil ist <em>-dɛʁn</em> →
+        Als Adjektiv betont auf der zweiten Silbe: Reimteil <em>-dɛʁn</em> →
         reimt auf <em>intern, extern, Kern</em>. Als Verb betont auf der ersten
-        Silbe: Reimteil ist <em>-moːdɐn</em> → reimt auf{" "}
-        <em>lodern, fodern, odern</em>.
+        Silbe: Reimteil <em>-oːdɐn</em> → reimt auf <em>lodern, fodern</em>.
+        Etwas kann also durchaus modern <em>und</em> am Modern sein – es klingt
+        nur völlig anders.
       </p>
 
       <h3>Tenor</h3>
       <div className="wissen-examples">
-        <div className="wissen-example-row">
-          <span className="wissen-example-word">Tenor (Inhalt)</span>
-          <span className="wissen-example-ipa">[ˈteːnoʁ]</span>
-          <span className="wissen-example-gloss">
-            Grundaussage, Sinngehalt eines Textes
-          </span>
-        </div>
-        <div className="wissen-example-row">
-          <span className="wissen-example-word">Tenor (Sänger)</span>
-          <span className="wissen-example-ipa">[teˈnoːɐ̯]</span>
-          <span className="wissen-example-gloss">hohe Männerstimme</span>
-        </div>
+        <Reading
+          word="Tenor"
+          tag="Inhalt"
+          ipa="[ˈteːnoʁ]"
+          pattern="10"
+          gloss="Grundaussage, Sinngehalt eines Textes"
+        />
+        <Reading
+          word="Tenor"
+          tag="Sänger"
+          ipa="[teˈnoːɐ̯]"
+          pattern="01"
+          gloss="hohe Männerstimme"
+        />
       </div>
       <p>
-        Der Inhalt-„Tenor" reimt auf <em>Humor, Major, Minor</em> (Betonung
-        vorne). Der Sänger-„Tenor" reimt auf <em>Büro, Bistro, Métro</em>{" "}
-        (Betonung hinten).
+        Der Inhalt-„Tenor" reimt auf <em>Mentor, Viktor, Mentor</em> (Betonung
+        vorne). Der Sänger-„Tenor" reimt auf <em>Komfort, Tresor, hervor</em>{" "}
+        (Betonung hinten) – zwei Wörter, die nicht einmal miteinander reimen,
+        obwohl sie sich buchstabengleich gegenüberstehen.
       </p>
 
-      <h3>übersetzen</h3>
+      <h3>umfahren</h3>
       <div className="wissen-examples">
-        <div className="wissen-example-row">
-          <span className="wissen-example-word">übersetzen (trennbar)</span>
-          <span className="wissen-example-ipa">[ˈyːbɐˌzɛtsn̩]</span>
-          <span className="wissen-example-gloss">
-            mit einem Boot ans andere Ufer bringen
-          </span>
-        </div>
-        <div className="wissen-example-row">
-          <span className="wissen-example-word">übersetzen (untrennbar)</span>
-          <span className="wissen-example-ipa">[yːbɐˈzɛtsn̩]</span>
-          <span className="wissen-example-gloss">
-            in eine andere Sprache übertragen
-          </span>
-        </div>
+        <Reading
+          word="úmfahren"
+          tag="trennbar"
+          ipa="[ˈʊmfaːʁən]"
+          pattern="100"
+          gloss="jemanden über den Haufen fahren"
+        />
+        <Reading
+          word="umfáhren"
+          tag="untrennbar"
+          ipa="[ʊmˈfaːʁən]"
+          pattern="010"
+          gloss="um ein Hindernis herumfahren"
+        />
       </div>
       <p>
-        Bei beiden liegt der Reimteil auf <em>-zɛtsn̩</em> – ein seltener Fall,
-        bei dem beide Varianten des Homographen auf dieselben Wörter reimen.
-        Trotzdem hat die Datenbank nur einen Eintrag.
+        Das vielleicht folgenreichste Homograph der Straßenverkehrsordnung:
+        Betont man die erste Silbe (<em>úmfahren</em>), fährt man jemanden um.
+        Betont man die zweite (<em>umfáhren</em>), fährt man höflich drumherum –
+        ein für den Fußgänger durchaus relevanter Unterschied. Die Betonung
+        verschiebt auch den Reimteil: <em>umfáhren</em> reimt sauber ab{" "}
+        <em>-aːʁən</em> auf <em>fahren, Scharen, sparen</em>; bei{" "}
+        <em>úmfahren</em> wandert die Betonung nach vorn und lässt kaum einen
+        Reimpartner übrig.
       </p>
 
       {/* ── Auswirkung ── */}
       <h2>Auswirkung auf die Reimsuche</h2>
+      <p>Reimwelt kann pro Wort nur eine IPA-Transkription speichern.</p>
       <p>
-        Reimwelt kann pro Wort nur <strong>eine IPA-Transkription</strong>{" "}
-        speichern. Bei Homographen wird in der Regel die häufigere oder in
-        Wiktionary zuerst eingetragene Aussprache verwendet. Die andere Variante
-        fehlt.
-      </p>
-      <p>
-        Das bedeutet in der Praxis: Suchst du nach Reimen auf <em>„modern"</em>{" "}
-        in seiner verbalen Bedeutung (verrotten), findest du möglicherweise
-        trotzdem die Reimgruppe des Adjektivs – oder umgekehrt.
+        Bei Homographen wird in der Regel die häufigere oder in Wiktionary
+        zuerst eingetragene Aussprache verwendet – die andere Variante fehlt.
+        Suchst du also nach Reimen auf <em>„modern"</em> in seiner verbalen
+        Bedeutung (verrotten), bekommst du möglicherweise trotzdem die
+        Reimgruppe des Adjektivs serviert. Oder umgekehrt.
       </p>
 
       <div className="wissen-callout">
         <p>
-          <strong>Workaround:</strong> Wenn du vermutest, dass ein Wort ein
-          Homograph ist, suche direkt nach einem anderen Wort aus der
-          gewünschten Reimgruppe. Gibst du zum Beispiel <em>„intern"</em> ein
-          statt <em>„modern"</em>, erhältst du zuverlässig alle Wörter auf{" "}
-          <em>-dɛʁn</em>.
+          <strong>Workaround:</strong> Wenn du ein Homograph vermutest, suche
+          einfach nach einem eindeutigen Wort aus der gewünschten Reimgruppe.
+          Gibst du <em>„intern"</em> statt <em>„modern"</em> ein, erhältst du
+          zuverlässig alle Wörter auf <em>-dɛʁn</em>.
         </p>
       </div>
 
@@ -119,17 +157,17 @@ export default function HomographePage() {
       <h2>Woran erkennst du ein Homograph?</h2>
       <ul>
         <li>
-          Das gesuchte Wort hat zwei klar verschiedene{" "}
-          <strong>Bedeutungen</strong> oder Wortarten (z. B. Verb und Adjektiv).
+          Das Wort hat zwei klar verschiedene <strong>Bedeutungen</strong> oder
+          Wortarten (etwa Verb und Adjektiv).
         </li>
         <li>
-          Die Ergebnisse in Reimwelt wirken <strong>„falsch"</strong> – die
-          gefundenen Reime passen nicht zu der Aussprache, die du im Kopf hast.
+          Die Ergebnisse wirken <strong>„falsch"</strong> – die Reime passen
+          nicht zu der Aussprache, die du im Kopf hast.
         </li>
         <li>
-          Im <strong>Detailpanel</strong> (Klick auf das ⓘ-Symbol bei einem
-          Treffer) siehst du die gespeicherte IPA. Stimmt sie nicht mit deiner
-          Aussprache überein, liegt ein Homograph vor.
+          Im <strong>Detailpanel</strong> (Klick auf das <InfoIcon />
+          -Symbol bei einem Treffer) siehst du die gespeicherte IPA. Stimmt sie
+          nicht mit deiner Aussprache überein, liegt ein Homograph vor.
         </li>
       </ul>
 
@@ -137,11 +175,12 @@ export default function HomographePage() {
       <h2>Zusammenhang mit IPA-Fehlern</h2>
       <p>
         Homographe sind eine der häufigsten Ursachen für überraschende
-        Ergebnisse – aber nicht die einzige. Automatisch generierte
-        IPA-Transkriptionen können auch bei eindeutigen Wörtern falsch sein,
+        Ergebnisse – aber nicht die einzige. Automatisch erzeugte
+        IPA-Transkriptionen können auch bei eindeutigen Wörtern danebenliegen,
         besonders bei Fremdwörtern oder Komposita. Der Unterschied: Bei einem
         IPA-Fehler gibt es <em>eine</em> korrekte Aussprache, die falsch kodiert
-        ist. Beim Homographen gibt es <em>zwei</em> korrekte Aussprachen.
+        ist. Beim Homographen gibt es <em>zwei</em> korrekte – und die Datenbank
+        muss sich für eine entscheiden.
       </p>
 
       {/* ── Siehe auch ── */}

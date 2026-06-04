@@ -279,6 +279,15 @@ _LANG_RHYME_NORMS: dict[str, tuple[tuple[str, str], ...]] = {
     "de": (("ai", "a\u026A"),),
 }
 
+# German: long vowel + word-final r \u2192 vocalized \u0250.
+# In Standard German (Hochdeutsch), /r/ is vocalized to [\u0250\u032F] after long vowels
+# at word boundaries (e.g. /vi\u02D0r/ \u2192 [vi\u02D0\u0250\u032F], /to\u02D0r/ \u2192 [to\u02D0\u0250\u032F]).  Kaikki data
+# transcribes this inconsistently \u2014 some entries use 'r', others '\u0250\u032F'/'\u0250'.
+# Normalising here unifies both forms so LIKE suffix matching and purity
+# scoring treat them as equivalent.  Short-vowel + r is left untouched because
+# vocalization is less categorical there (e.g. French loans like "Bistro").
+_DE_FINAL_R = re.compile(r"(i\u02D0|e\u02D0|a\u02D0|o\u02D0|u\u02D0|\u00F8\u02D0|y\u02D0|\u025B\u02D0|\u0254\u02D0)r$")
+
 
 def _normalize_rhyme_ipa(rp: str, lang: str | None = None) -> str:
     """
@@ -319,6 +328,8 @@ def _normalize_rhyme_ipa(rp: str, lang: str | None = None) -> str:
     if lang is not None:
         for old, new in _LANG_RHYME_NORMS.get(lang, ()):
             rp = rp.replace(old, new)
+        if lang == "de":
+            rp = _DE_FINAL_R.sub(r"\1ɐ", rp)
     return rp
 
 

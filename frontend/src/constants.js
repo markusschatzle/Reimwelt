@@ -15,6 +15,19 @@ export const METER_LABELS = {
   molossus: "Molossus",
 };
 
+export const METER_PATTERNS = {
+  iamb: "01",
+  trochee: "10",
+  dactyl: "100",
+  anapest: "001",
+  spondee: "11",
+  amphibrach: "010",
+  amphimacer: "101",
+  bacchius: "011",
+  antibacchius: "110",
+  molossus: "111",
+};
+
 export const SORT_MODES = [
   { value: "balanced", label: "Ausgewogen" },
   { value: "purity_desc", label: "Reinheit", dir: "desc" },

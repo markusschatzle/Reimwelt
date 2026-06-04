@@ -1,18 +1,41 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+// A real, attributed verse with per-line rhyme-scheme tags.
+// `lines` is an array of [text, schemeLetter] pairs.
+function VerseCard({ lines, author, work }) {
+  return (
+    <figure className="wissen-verse">
+      {lines.map(([text, letter], i) => (
+        <div className="wissen-verse-line" key={i}>
+          <span className={`wissen-rhyme-tag is-${letter.toLowerCase()}`}>
+            {letter}
+          </span>
+          <span>{text}</span>
+        </div>
+      ))}
+      <figcaption className="wissen-verse-cite">
+        {author}, <cite>{work}</cite>
+      </figcaption>
+    </figure>
+  );
+}
+
 export default function ReimenPage() {
   return (
     <div className="wissen-page">
-      <Link to="/wissenswelt" className="wissen-breadcrumb">
-        ← Wissenswelt
-      </Link>
-
-      <h1>Was ist ein Reim?</h1>
-      <p className="wissen-subtitle">
-        Die Grundlagen des Gleichklangs – von der Definition über Reimarten bis
-        zu klassischen Schemata.
-      </p>
+      <header className="wissen-hero">
+        <Link to="/wissenswelt" className="wissen-breadcrumb">
+          ← Wissenswelt
+        </Link>
+        <span className="wissen-kicker">Wissenswelt · Grundlagen</span>
+        <h1>Was ist ein Reim?</h1>
+        <p className="wissen-lead">
+          Die Kunst des Gleichklangs – von der nüchternen Definition über die
+          Reimarten bis zu den Schemata, nach denen Dichter seit Jahrhunderten
+          ihre Zeilen sortieren.
+        </p>
+      </header>
 
       {/* ── Definition ── */}
       <h2>Definition</h2>
@@ -125,60 +148,53 @@ export default function ReimenPage() {
       {/* ── Reimschemata ── */}
       <h2>Reimschemata</h2>
       <p>
-        Reimschemata beschreiben, wie die Reime in einem Gedicht oder Songtext
-        angeordnet sind. Jeder Buchstabe steht für einen neuen Reim.
+        Reimschemata beschreiben, wie die Reime in einer Strophe angeordnet
+        sind. Jeder Buchstabe steht für einen eigenen Klang – und damit du dir
+        nichts merken musst, kommen die Beispiele hier von Leuten, die das
+        Reimen erwiesenermaßen beherrschten.
       </p>
 
       <h3>Paarreim (AABB)</h3>
       <p>Je zwei aufeinanderfolgende Zeilen reimen sich.</p>
-      <div className="wissen-schema-block">
-        Es war einmal ein König fein,{" "}
-        <span className="wissen-schema-label">A</span>
-        <br />
-        der liebte sehr den Sonnenschein.{" "}
-        <span className="wissen-schema-label">A</span>
-        <br />
-        Sein Schloss stand hoch auf grünem Hang,{" "}
-        <span className="wissen-schema-label">B</span>
-        <br />
-        doch sommers war dem Fürsten bang.{" "}
-        <span className="wissen-schema-label">B</span>
-      </div>
+      <VerseCard
+        lines={[
+          ["Mancher gibt sich viele Müh,", "A"],
+          ["mit dem lieben Federvieh;", "A"],
+          ["einesteils der Eier wegen,", "B"],
+          ["welche diese Vögel legen.", "B"],
+        ]}
+        author="Wilhelm Busch"
+        work="Max und Moritz"
+      />
 
       <h3>Kreuzreim (ABAB)</h3>
       <p>Gerade und ungerade Zeilen reimen sich abwechselnd.</p>
-      <div className="wissen-schema-block">
-        Ich wandre durch die stille Nacht,{" "}
-        <span className="wissen-schema-label">A</span>
-        <br />
-        der Mond scheint hell und klar.{" "}
-        <span className="wissen-schema-label">B</span>
-        <br />
-        Ein Lied, das niemand je gedacht,{" "}
-        <span className="wissen-schema-label">A</span>
-        <br />
-        klingt mir aus ferner Jahr.{" "}
-        <span className="wissen-schema-label">B</span>
-      </div>
+      <VerseCard
+        lines={[
+          ["Es war, als hätt der Himmel", "A"],
+          ["die Erde still geküsst,", "B"],
+          ["dass sie im Blütenschimmer", "A"],
+          ["von ihm nur träumen müsst.", "B"],
+        ]}
+        author="Joseph von Eichendorff"
+        work="Mondnacht"
+      />
 
       <h3>Umarmender Reim (ABBA)</h3>
       <p>
-        Die erste und vierte Zeile reimen sich, ebenso die zweite und dritte –
-        ein „eingerahmter" Reim.
+        Erste und vierte Zeile reimen sich, ebenso die zweite und dritte – ein
+        „eingerahmter" Reim, der die B-Zeilen regelrecht umarmt.
       </p>
-      <div className="wissen-schema-block">
-        Die Rosen blühn im Morgentau,{" "}
-        <span className="wissen-schema-label">A</span>
-        <br />
-        ihr Duft schwebt durch die Luft so leis.{" "}
-        <span className="wissen-schema-label">B</span>
-        <br />
-        Im Garten liegt noch weißer Eis,{" "}
-        <span className="wissen-schema-label">B</span>
-        <br />
-        der Himmel strahlt in tiefem Blau.{" "}
-        <span className="wissen-schema-label">A</span>
-      </div>
+      <VerseCard
+        lines={[
+          ["Du siehst, wohin du siehst, nur Eitelkeit auf Erden.", "A"],
+          ["Was dieser heute baut, reißt jener morgen ein;", "B"],
+          ["wo itzund Städte stehn, wird eine Wiese sein,", "B"],
+          ["auf der ein Schäferskind wird spielen mit den Herden.", "A"],
+        ]}
+        author="Andreas Gryphius"
+        work="Es ist alles eitel"
+      />
 
       {/* ── CTA ── */}
       <div className="wissen-cta-row">

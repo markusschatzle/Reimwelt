@@ -4,11 +4,15 @@ import { Link } from "react-router-dom";
 export default function WissensweltPage() {
   return (
     <div className="wissen-page">
-      <h1>Wissenswelt</h1>
-      <p className="wissen-subtitle">
-        Wie Reimwelt funktioniert – und was du über Reime, Rhythmus und
-        Lautschrift wissen solltest.
-      </p>
+      <header className="wissen-hero">
+        <span className="wissen-kicker">Reimwelt · Handbuch</span>
+        <h1>Wissenswelt</h1>
+        <p className="wissen-lead">
+          Wie Reimwelt unter der Haube tickt – und alles, was du über Reime,
+          Rhythmus und Lautschrift wissen wolltest, ohne je ein Phonetikseminar
+          besucht zu haben.
+        </p>
+      </header>
 
       {/* ── Wie es funktioniert ── */}
       <h2>Wie es funktioniert</h2>
@@ -109,9 +113,10 @@ export default function WissensweltPage() {
 
       <h3>Keine semantische Ebene</h3>
       <p>
-        Reimwelt weiß nicht, was Wörter bedeuten. <em>„schön"</em> und{" "}
-        <em>„Gestöhn"</em> reimen sich lautlich einwandfrei – ob das inhaltlich
-        passt, liegt allein bei dir.
+        Reimwelt ist Phonetiker, nicht Poet: Es weiß, wie Wörter klingen, aber
+        nicht, was sie bedeuten. <em>„schön"</em> und <em>„Gestöhn"</em> reimen
+        sich lautlich einwandfrei – ob das inhaltlich eine gute Idee ist, liegt
+        ganz allein bei dir.
       </p>
 
       <div className="wissen-callout">
@@ -131,7 +136,7 @@ export default function WissensweltPage() {
 
       <div className="wissen-cards-grid">
         <Link to="/wissenswelt/reimen" className="wissen-card">
-          <span className="wissen-card-icon">🎵</span>
+          <span className="wissen-card-icon" aria-hidden="true">🎵</span>
           <span className="wissen-card-title">Was ist ein Reim?</span>
           <span className="wissen-card-desc">
             Von reinen und unreinen Reimen über Reimschemata bis zu den
@@ -140,7 +145,7 @@ export default function WissensweltPage() {
         </Link>
 
         <Link to="/wissenswelt/homographe" className="wissen-card">
-          <span className="wissen-card-icon">🔤</span>
+          <span className="wissen-card-icon" aria-hidden="true">🔤</span>
           <span className="wissen-card-title">Homographe</span>
           <span className="wissen-card-desc">
             Gleiche Schreibung, verschiedene Aussprache – wie solche Wörter die
@@ -149,7 +154,7 @@ export default function WissensweltPage() {
         </Link>
 
         <Link to="/wissenswelt/metrum" className="wissen-card">
-          <span className="wissen-card-icon">🎼</span>
+          <span className="wissen-card-icon" aria-hidden="true">🎼</span>
           <span className="wissen-card-title">Metrum &amp; Rhythmus</span>
           <span className="wissen-card-desc">
             Jambus, Trochäus, Daktylus – die Versfüße der deutschen Dichtung,
@@ -158,7 +163,7 @@ export default function WissensweltPage() {
         </Link>
 
         <Link to="/wissenswelt/ipa" className="wissen-card">
-          <span className="wissen-card-icon">🔊</span>
+          <span className="wissen-card-icon" aria-hidden="true">🔊</span>
           <span className="wissen-card-title">IPA – Lautschrift</span>
           <span className="wissen-card-desc">
             Was bedeuten die Zeichen in Reimwelt? Eine Einführung ins

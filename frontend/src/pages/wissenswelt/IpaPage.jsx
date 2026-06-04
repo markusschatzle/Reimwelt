@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { InfoIcon } from "./_widgets.jsx";
 
 // ---------------------------------------------------------------------------
 // IPA symbol tables
@@ -78,10 +79,10 @@ function IpaTable({ rows }) {
       <table className="ipa-table">
         <thead>
           <tr>
-            <th>Symbol</th>
-            <th>Beispielwort</th>
-            <th>IPA</th>
-            <th>Hinweis</th>
+            <th scope="col">Symbol</th>
+            <th scope="col">Beispielwort</th>
+            <th scope="col">IPA</th>
+            <th scope="col">Hinweis</th>
           </tr>
         </thead>
         <tbody>
@@ -112,15 +113,18 @@ function IpaTable({ rows }) {
 export default function IpaPage() {
   return (
     <div className="wissen-page">
-      <Link to="/wissenswelt" className="wissen-breadcrumb">
-        ← Wissenswelt
-      </Link>
-
-      <h1>IPA – Lautschrift</h1>
-      <p className="wissen-subtitle">
-        Das Internationale Phonetische Alphabet – wie es funktioniert, warum
-        Reimwelt es verwendet und was die wichtigsten Symbole bedeuten.
-      </p>
+      <header className="wissen-hero">
+        <Link to="/wissenswelt" className="wissen-breadcrumb">
+          ← Wissenswelt
+        </Link>
+        <span className="wissen-kicker">Wissenswelt · Lautschrift</span>
+        <h1>IPA – Lautschrift</h1>
+        <p className="wissen-lead">
+          Das Internationale Phonetische Alphabet: ein Zeichensatz, der
+          aufschreibt, was dein Mund tatsächlich tut – und nicht, was die
+          Rechtschreibung gern hätte.
+        </p>
+      </header>
 
       {/* ── Was ist IPA? ── */}
       <h2>Was ist das IPA?</h2>
@@ -186,8 +190,9 @@ export default function IpaPage() {
           IPA-Transkription des eingegebenen Wortes.
         </li>
         <li>
-          <strong>Detailpanel:</strong> Klickst du auf das ⓘ-Symbol bei einem
-          Treffer, siehst du die vollständige IPA-Schreibung inkl. Betonung.
+          <strong>Detailpanel:</strong> Klickst du auf das <InfoIcon />
+          -Symbol bei einem Treffer, siehst du die vollständige IPA-Schreibung
+          inkl. Betonung.
         </li>
         <li>
           <strong>Reimteil:</strong> In den Suchergebnissen ist der Reimteil
@@ -216,6 +221,54 @@ export default function IpaPage() {
         Schreibung:
       </p>
       <IpaTable rows={KONSONANTEN} />
+
+      {/* ── Variation ── */}
+      <h2>Eine Schreibung, viele Aussprachen</h2>
+      <p>
+        Hier wird es kniffflig: <em>Die eine</em> richtige Aussprache gibt es
+        oft gar nicht.
+      </p>
+      <p>
+        Wie ein Wort klingt, hängt von Dialekt, Region, Akzent und sogar der
+        Sprechsituation ab. Reimwelt kann pro Wort aber nur{" "}
+        <strong>eine</strong> IPA-Transkription speichern – in der Regel die
+        überregionale Standardlautung. Dein Sprachgefühl darf davon abweichen.
+      </p>
+      <p>
+        Das Paradebeispiel ist die Endung <em>-ig</em>. In der Standardlautung
+        wird sie als ich-Laut <span className="ipa-symbol">[ɪç]</span>{" "}
+        gesprochen – dann reimt <em>lustig</em> sauber auf <em>möglich</em>:
+      </p>
+      <div className="wissen-examples">
+        <div className="wissen-example-row">
+          <span className="wissen-example-word">
+            lustig
+            <span className="wissen-example-tag">Standard</span>
+          </span>
+          <span className="wissen-example-ipa">[ˈlʊstɪç]</span>
+          <span className="wissen-example-gloss">reimt auf möglich [ˈmøːklɪç]</span>
+        </div>
+        <div className="wissen-example-row">
+          <span className="wissen-example-word">
+            lustig
+            <span className="wissen-example-tag">süddt. / öster.</span>
+          </span>
+          <span className="wissen-example-ipa">[ˈlʊstɪk]</span>
+          <span className="wissen-example-gloss">
+            mit hartem g – reimt <em>nicht</em> auf möglich
+          </span>
+        </div>
+      </div>
+      <p>
+        Spricht jemand das <em>g</em> hingegen hart aus –{" "}
+        <span className="ipa-symbol">[ˈlʊstɪk]</span>, wie in weiten Teilen
+        Süddeutschlands, Österreichs und der Schweiz –, ist der Reim auf{" "}
+        <em>möglich</em> dahin. Beide Aussprachen sind völlig korrekt; sie führen
+        nur zu verschiedenen Reimen. Genau diese Vielstimmigkeit ist eine der
+        größten Hürden, die eine algorithmische Reimsuche grundsätzlich nicht
+        auflösen kann: Sie muss sich für eine Lesart entscheiden – und liegt
+        damit für einen Teil der Sprecher zwangsläufig daneben.
+      </p>
 
       {/* ── Tipp ── */}
       <div className="wissen-callout">

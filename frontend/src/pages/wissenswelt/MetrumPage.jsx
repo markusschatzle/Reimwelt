@@ -1,21 +1,220 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { MeterDots, InfoIcon } from "./_widgets.jsx";
 
 // ---------------------------------------------------------------------------
-// Animated meter line
+// Helpers
 // ---------------------------------------------------------------------------
 
-function MeterLine({ syllables }) {
+// Inline colored syllables: stressed = accent, unstressed = muted.
+// Each syllable is { t: string, s: boolean }
+function ColoredVerse({ syllables }) {
   return (
-    <div className="meter-line">
-      {syllables.map(({ text, stressed }, i) => (
-        <div
-          key={i}
-          className={`meter-syllable ${stressed ? "stressed" : "unstressed"}`}
-          style={stressed ? { animationDelay: `${i * 0.2}s` } : undefined}
-        >
-          <span className="meter-stress-mark">{stressed ? "ˈ" : "·"}</span>
-          <span>{text}</span>
+    <div className="verse-colored">
+      {syllables.map((s, i) => (
+        <span key={i} className={s.s ? "verse-syl--stress" : undefined}>
+          {s.t}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Four main Versfüße  (attributed, with syllabified meter colors)
+// ---------------------------------------------------------------------------
+
+const FEET = [
+  {
+    name: "Jambus",
+    schema: "· ˈ",
+    pattern: "01010101",
+    desc: "Der Jambus beginnt unbetont und endet betont – er klingt vorwärtsgerichtet und ganz natürlich. Es ist das häufigste Versmaß der deutschen Dichtung und steckt auch in mehr Popsongs, als ihren Texterinnen und Textern bewusst ist.",
+    // "Ich den-ke dein, wenn mir der Son-ne Schim-mer …"  — iambic pentameter
+    syllables: [
+      { t: "Ich ", s: false },
+      { t: "den", s: true },
+      { t: "ke ", s: false },
+      { t: "dein, ", s: true },
+      { t: "wenn ", s: false },
+      { t: "mir ", s: true },
+      { t: "der ", s: false },
+      { t: "Son", s: true },
+      { t: "ne ", s: false },
+      { t: "Schim", s: true },
+      { t: "mer …", s: false },
+    ],
+    line: "Ich denke dein, wenn mir der Sonne Schimmer …",
+    author: "Johann Wolfgang von Goethe",
+    work: "Nähe des Geliebten",
+  },
+  {
+    name: "Trochäus",
+    schema: "ˈ ·",
+    pattern: "10101010",
+    desc: "Das Gegenstück zum Jambus: betont, dann unbetont. Er wirkt entschlossen und fallend, manchmal erdig. Volkslieder, Kinderreime und so mancher Zauberspruch sind durch und durch trochäisch.",
+    // "Früh-ling lässt sein blau-es Band …"
+    syllables: [
+      { t: "Früh", s: true },
+      { t: "ling ", s: false },
+      { t: "lässt ", s: true },
+      { t: "sein ", s: false },
+      { t: "blau", s: true },
+      { t: "es ", s: false },
+      { t: "Band …", s: true },
+    ],
+    line: "Frühling lässt sein blaues Band …",
+    author: "Eduard Mörike",
+    work: "Er ist's",
+  },
+  {
+    name: "Daktylus",
+    schema: "ˈ · ·",
+    pattern: "100100100",
+    desc: "Eine betonte und zwei unbetonte Silben – wie ein Herzschlag mit Echo. Tänzerisch und fließend; das Maß antiker Hexameter, festlicher Hymnen und schwermütiger Elegien.",
+    // "Auch das Schö-ne muss ster-ben, das Men-schen und Göt-ter …"  (dactylic hexameter)
+    syllables: [
+      { t: "Auch ", s: true },
+      { t: "das ", s: false },
+      { t: "Schö", s: false },
+      { t: "ne ", s: true },
+      { t: "muss ", s: false },
+      { t: "ster", s: false },
+      { t: "ben, ", s: true },
+      { t: "das ", s: false },
+      { t: "Men", s: false },
+      { t: "schen ", s: true },
+      { t: "und ", s: false },
+      { t: "Göt", s: false },
+      { t: "ter …", s: true },
+    ],
+    line: "Auch das Schöne muss sterben, das Menschen und Götter bezwinget …",
+    author: "Friedrich Schiller",
+    work: "Nänie",
+  },
+  {
+    name: "Anapäst",
+    schema: "· · ˈ",
+    pattern: "001001001",
+    desc: "Das Spiegelbild des Daktylus: zwei unbetonte Silben rollen auf die Betonung zu. Drängend und anrollend – wie geschaffen für Verse, in denen es gleich gischtet und tost.",
+    // "Und es wal-let und sie-det und brau-set und zischt"
+    syllables: [
+      { t: "Und ", s: false },
+      { t: "es ", s: false },
+      { t: "wal", s: true },
+      { t: "let ", s: false },
+      { t: "und ", s: false },
+      { t: "sie", s: true },
+      { t: "det ", s: false },
+      { t: "und ", s: false },
+      { t: "brau", s: true },
+      { t: "set ", s: false },
+      { t: "und ", s: false },
+      { t: "zischt", s: true },
+    ],
+    line: "Und es wallet und siedet und brauset und zischt",
+    author: "Friedrich Schiller",
+    work: "Der Taucher",
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Uncommon meters (condensed table)
+// ---------------------------------------------------------------------------
+
+const UNCOMMON = [
+  {
+    name: "Spondeus",
+    pattern: "11",
+    schema: "ˈ ˈ",
+    note: "Zwei Betonungen in Folge – wirkt wuchtig, z. B. in Komposita wie „Sturmnacht“",
+  },
+  {
+    name: "Amphibrach",
+    pattern: "010",
+    schema: "· ˈ ·",
+    note: "Betont in der Mitte; viele dreisilbige Wörter wie „Geliebte“",
+  },
+  {
+    name: "Amphimakros",
+    pattern: "101",
+    schema: "ˈ · ˈ",
+    note: "Auch Kretikus oder Amphimacer genannt und eher innerhalb von Versen zu finden wie z. B. „Dies Gewand“",
+  },
+  {
+    name: "Bacchius",
+    pattern: "011",
+    schema: "· ˈ ˈ",
+    note: "Erst schwach, dann zwei Betonungen; selten im Deutschen",
+  },
+  {
+    name: "Antibacchius",
+    pattern: "110",
+    schema: "ˈ ˈ ·",
+    note: "Zwei Betonungen, dann schwach; ebenso selten",
+  },
+  {
+    name: "Molossus",
+    pattern: "111",
+    schema: "ˈ ˈ ˈ",
+    note: "Drei betonte Silben hintereinander – schwer wie ein Dreischlag-Hammer",
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Components
+// ---------------------------------------------------------------------------
+
+function FootCard({
+  name,
+  schema,
+  pattern,
+  desc,
+  syllables,
+  line,
+  author,
+  work,
+}) {
+  return (
+    <div className="meter-foot-section">
+      <div className="meter-foot-header">
+        <span className="meter-foot-name">{name}</span>
+        <MeterDots
+          pattern={pattern}
+          label={`${name} (Betonungsmuster)`}
+          className="meter-dots--lg meter-dots--animated"
+        />
+        <span className="meter-foot-schema">{schema}</span>
+      </div>
+      <p>{desc}</p>
+      <figure className="wissen-verse wissen-verse--single">
+        <ColoredVerse syllables={syllables} />
+        <figcaption className="wissen-verse-cite">
+          {author}, <cite>{work}</cite>
+        </figcaption>
+      </figure>
+    </div>
+  );
+}
+
+function UncommonTable() {
+  return (
+    <div
+      className="meter-condensed-table"
+      role="table"
+      aria-label="Seltene Versfüße"
+    >
+      {UNCOMMON.map(({ name, pattern, note }) => (
+        <div key={name} className="meter-condensed-row" role="row">
+          <span className="meter-condensed-name" role="cell">
+            {name}
+          </span>
+          <span className="meter-condensed-dots" role="cell">
+            <MeterDots pattern={pattern} label={name} />
+          </span>
+          <span className="meter-condensed-note" role="cell">
+            {note}
+          </span>
         </div>
       ))}
     </div>
@@ -29,156 +228,70 @@ function MeterLine({ syllables }) {
 export default function MetrumPage() {
   return (
     <div className="wissen-page">
-      <Link to="/wissenswelt" className="wissen-breadcrumb">
-        ← Wissenswelt
-      </Link>
-
-      <h1>Metrum &amp; Rhythmus</h1>
-      <p className="wissen-subtitle">
-        Die Grundeinheiten des Versrhythmus – vier klassische Versfüße, visuell
-        und mit animierten Betonungsmustern.
-      </p>
+      <header className="wissen-hero">
+        <Link to="/wissenswelt" className="wissen-breadcrumb">
+          ← Wissenswelt
+        </Link>
+        <span className="wissen-kicker">Wissenswelt · Rhythmus</span>
+        <h1>Metrum &amp; Rhythmus</h1>
+        <p className="wissen-lead">
+          Der Herzschlag der Sprache: vier klassische Versfüße, mit Punkten
+          zerlegt und an echten Versen von Goethe bis Schiller vorgeführt.
+        </p>
+      </header>
 
       {/* ── Was ist Metrum? ── */}
       <h2>Was ist Metrum?</h2>
       <p>
-        Das <strong>Metrum</strong> (auch: Versmaß) beschreibt das regelmäßige
-        Betonungsmuster in einem Vers oder Songtext. Es entsteht durch die
-        Abfolge von <strong>betonten</strong> (ˈ) und{" "}
-        <strong>unbetonten</strong> (·) Silben.
+        Das <strong>Metrum</strong> (auch: Versmaß) ist das regelmäßige
+        Betonungsmuster eines Verses oder Songtexts.
       </p>
       <p>
-        Die kleinste rhythmische Einheit heißt <strong>Versfuß</strong>.
-        Kombiniert man mehrere Versfüße hintereinander, ergibt sich ein
-        vollständiger Vers. Ein Vers mit vier Jamben heißt zum Beispiel
-        „vierhebiger Jambus" – das klassische Maß von Shakespeares Sonetten und
-        Schillers Balladen.
+        Es entsteht durch die Abfolge von <strong>betonten</strong> und{" "}
+        <strong>unbetonten</strong> Silben – in Reimwelt dargestellt als{" "}
+        <MeterDots pattern="10" label="betont, unbetont" /> gefüllte und leere
+        Kreise. Die kleinste rhythmische Einheit heißt <strong>Versfuß</strong>;
+        reiht man mehrere aneinander, ergibt sich ein vollständiger Vers. Vier
+        Jamben hintereinander heißen etwa „vierhebiger Jambus" – das Maß von
+        Shakespeares Sonetten und Schillers Balladen.
       </p>
       <p>
         Reimwelt erkennt das Metrum jedes Wortes automatisch aus seinem
-        Betonungsmuster und zeigt es im Detailpanel. Über den Filter in der
+        Betonungsmuster und zeigt es im Detailpanel an. Über den Filter in der
         Suchleiste kannst du Ergebnisse auf ein bestimmtes Versmaß einschränken.
       </p>
 
       {/* ── Vier Versfüße ── */}
       <h2>Die vier klassischen Versfüße</h2>
+      <p>
+        Betonte Silben sind{" "}
+        <span className="verse-syl--stress">farblich hervorgehoben</span>,
+        unbetonte bleiben grau. Die Beispiele sind echte Verszeilen – lies sie
+        laut und klopf den Takt mit.
+      </p>
 
-      {/* Jambus */}
-      <div className="meter-foot-section">
-        <div className="meter-foot-header">
-          <span className="meter-foot-name">Jambus</span>
-          <span className="meter-foot-schema">· ˈ · ˈ · ˈ · ˈ</span>
-        </div>
-        <MeterLine
-          syllables={[
-            { text: "ich", stressed: false },
-            { text: "wand", stressed: true },
-            { text: "re", stressed: false },
-            { text: "durch", stressed: true },
-            { text: "die", stressed: false },
-            { text: "Wel", stressed: true },
-            { text: "ten", stressed: false },
-            { text: "weit", stressed: true },
-          ]}
-        />
-        <p className="meter-example-line">
-          „Ich wandre durch die Welten weit …"
-        </p>
-        <p>
-          Der Jambus beginnt unbetont und endet betont – er klingt
-          vorwärtsgerichtet und natürlich. Er ist das häufigste Versmaß in der
-          deutschen Dichtung und kommt auch in vielen Songtexten unbewusst vor.
-        </p>
-      </div>
+      {FEET.map((foot) => (
+        <FootCard key={foot.name} {...foot} />
+      ))}
 
-      {/* Trochäus */}
-      <div className="meter-foot-section">
-        <div className="meter-foot-header">
-          <span className="meter-foot-name">Trochäus</span>
-          <span className="meter-foot-schema">ˈ · ˈ · ˈ · ˈ ·</span>
-        </div>
-        <MeterLine
-          syllables={[
-            { text: "Ro", stressed: true },
-            { text: "sen", stressed: false },
-            { text: "blühn", stressed: true },
-            { text: "im", stressed: false },
-            { text: "Mor", stressed: true },
-            { text: "gen", stressed: false },
-            { text: "rot", stressed: true },
-            { text: "en", stressed: false },
-          ]}
-        />
-        <p className="meter-example-line">„Rosenblühn im Morgenroten …"</p>
-        <p>
-          Der Trochäus ist das Gegenstück zum Jambus: betont-unbetont. Er wirkt
-          entschlossen, fallend, manchmal erdig. Viele deutschen Volkslieder und
-          Kinderreime sind trochäisch.
-        </p>
-      </div>
-
-      {/* Daktylus */}
-      <div className="meter-foot-section">
-        <div className="meter-foot-header">
-          <span className="meter-foot-name">Daktylus</span>
-          <span className="meter-foot-schema">ˈ · · ˈ · · ˈ · ·</span>
-        </div>
-        <MeterLine
-          syllables={[
-            { text: "Kö", stressed: true },
-            { text: "ni", stressed: false },
-            { text: "ge", stressed: false },
-            { text: "Hel", stressed: true },
-            { text: "den", stressed: false },
-            { text: "und", stressed: false },
-            { text: "Göt", stressed: true },
-            { text: "ter", stressed: false },
-          ]}
-        />
-        <p className="meter-example-line">„Könige, Helden und Götter …"</p>
-        <p>
-          Der Daktylus hat eine betonte und zwei unbetonte Silben – wie ein
-          Herzschlag mit Echo. Er klingt tänzerisch und fließend und findet sich
-          in Walzerliedern, Hymnen und antiken Hexametern.
-        </p>
-      </div>
-
-      {/* Anapäst */}
-      <div className="meter-foot-section">
-        <div className="meter-foot-header">
-          <span className="meter-foot-name">Anapäst</span>
-          <span className="meter-foot-schema">· · ˈ · · ˈ · · ˈ</span>
-        </div>
-        <MeterLine
-          syllables={[
-            { text: "in", stressed: false },
-            { text: "dem", stressed: false },
-            { text: "Wald", stressed: true },
-            { text: "an", stressed: false },
-            { text: "dem", stressed: false },
-            { text: "Bach", stressed: true },
-            { text: "ü", stressed: false },
-            { text: "ber", stressed: false },
-            { text: "Nach", stressed: true },
-          ]}
-        />
-        <p className="meter-example-line">
-          „in dem Wald, an dem Bach über Nacht …"
-        </p>
-        <p>
-          Der Anapäst ist das Spiegelbild des Daktylus: zwei unbetonte Silben
-          führen zur Betonung hin. Er klingt anrollend und drängend – ideal für
-          Marschrhythmen und dramatische Wendungen.
-        </p>
-      </div>
+      {/* ── Seltene Versfüße ── */}
+      <h2>Weitere Versfüße in Reimwelt</h2>
+      <p>
+        Reimwelt erkennt noch sechs weitere Betonungsmuster. Sie treten seltener
+        auf als die großen Vier, tauchen aber in der Datenbank auf und können im
+        Metrum-Filter ausgewählt werden.
+      </p>
+      <UncommonTable />
 
       {/* ── Metrum in Reimwelt ── */}
-      <h2>Metrum in Reimwelt</h2>
+      <h2>Metrum im Detailpanel</h2>
       <p>
-        Im <strong>Detailpanel</strong> jedes Wortes (Klick auf das ⓘ-Symbol)
-        siehst du das Betonungsmuster als Punkte dargestellt: ein gefüllter
-        Kreis steht für eine betonte Silbe, ein leerer Kreis für eine unbetonte.
-        Daraus lässt sich direkt ablesen, welchem Versfuß das Wort entspricht.
+        Im <strong>Detailpanel</strong> jedes Wortes – ein Klick auf das{" "}
+        <InfoIcon /> -Symbol bei einem Treffer – siehst du das Betonungsmuster
+        als dieselben Kreise:{" "}
+        <MeterDots pattern="010" label="unbetont, betont, unbetont" /> steht zum
+        Beispiel für ein Wort wie <em>„Geliebte"</em>. Daraus lässt sich direkt
+        ablesen, welchem Versfuß das Wort entspricht.
       </p>
       <p>
         Im <strong>Metrum-Filter</strong> der Suchoberfläche kannst du

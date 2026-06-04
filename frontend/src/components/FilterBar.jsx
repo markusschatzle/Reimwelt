@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Pill from "./Pill.jsx";
-import { METER_LABELS, POS_LABELS } from "../constants.js";
+import { METER_LABELS, METER_PATTERNS, POS_LABELS } from "../constants.js";
+import { MeterDots } from "../pages/wissenswelt/_widgets.jsx";
 
 function FilterDropdown({ label, value, onChange, options }) {
   const [open, setOpen] = useState(false);
@@ -87,6 +88,7 @@ function FilterDropdown({ label, value, onChange, options }) {
               }}
             >
               <span className="filter-dd-option-label">{o.label}</span>
+              {o.extra}
               <span className="pill-count">{o.count}</span>
             </button>
           ))}
@@ -115,6 +117,13 @@ export default function FilterBar({
     value: k,
     label: METER_LABELS[k] || k,
     count: v,
+    extra: METER_PATTERNS[k] ? (
+      <MeterDots
+        pattern={METER_PATTERNS[k]}
+        label=""
+        className="filter-dd-meter-dots"
+      />
+    ) : null,
   }));
 
   const hasResults =
