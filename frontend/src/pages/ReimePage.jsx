@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from "react";
 
-import { LANG_GROUPS, POS_LABELS } from "../constants.js";
+import { LANGS, POS_LABELS } from "../constants.js";
 import { searchRhymes, fetchWordDetail } from "../api.js";
 import {
   sortResults,
@@ -219,7 +219,7 @@ export default function ReimePage() {
         {/* Language row */}
         <div className="lang-row">
           <LangDropdown
-            groups={LANG_GROUPS}
+            langs={LANGS}
             value={sourceLang}
             onChange={(lang) => {
               setSourceLang(lang);
@@ -241,7 +241,7 @@ export default function ReimePage() {
             <span className="lang-arrow">→</span>
           </div>
           <LangDropdown
-            groups={LANG_GROUPS}
+            langs={LANGS}
             value={targetLang}
             onChange={(lang) => {
               setTargetLang(lang);

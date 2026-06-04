@@ -6,7 +6,7 @@ import React, {
   useEffect,
 } from "react";
 
-import { LANG_GROUPS } from "../constants.js";
+import { LANGS } from "../constants.js";
 import { searchEndings, fetchWordDetail } from "../api.js";
 import { sortResults, deduplicateResults } from "../utils.js";
 
@@ -352,7 +352,7 @@ export default function EndungenPage() {
         {/* Language row — single selector */}
         <div className="lang-row">
           <LangDropdown
-            groups={LANG_GROUPS}
+            langs={LANGS}
             value={lang}
             onChange={setLang}
             label="Sprache"

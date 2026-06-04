@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 
-export default function LangDropdown({ groups, value, onChange, label }) {
+export default function LangDropdown({ langs, value, onChange, label }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const btnRef = useRef(null);
-  const allLangs = groups.flatMap((g) => g.langs);
-  const current = allLangs.find((l) => l.code === value) || allLangs[0];
+  const current = langs.find((l) => l.code === value) || langs[0];
 
   useEffect(() => {
     if (!open) return;
@@ -36,10 +35,8 @@ export default function LangDropdown({ groups, value, onChange, label }) {
           const newOpen = !open;
           if (newOpen && btnRef.current) {
             const rect = btnRef.current.getBoundingClientRect();
-            document.documentElement.style.setProperty(
-              "--lang-panel-top",
-              `${rect.bottom + 6}px`,
-            );
+            document.documentElement.style.setProperty("--lang-panel-top", `${rect.bottom + 6}px`);
+            document.documentElement.style.setProperty("--lang-panel-left", `${rect.left + rect.width / 2}px`);
           }
           setOpen(newOpen);
         }}
@@ -66,24 +63,19 @@ export default function LangDropdown({ groups, value, onChange, label }) {
 
       {open && (
         <div className="lang-dropdown-panel">
-          {groups.map((g) => (
-            <div key={g.group} className="lang-option-group">
-              <span className="lang-group-header">{g.group}</span>
-              {g.langs.map((l) => (
-                <button
-                  key={l.code}
-                  type="button"
-                  className={`lang-option${l.code === value ? " active" : ""}`}
-                  onClick={() => {
-                    onChange(l.code);
-                    setOpen(false);
-                  }}
-                >
-                  <span className="lang-option-code">{l.code}</span>
-                  <span className="lang-option-label">{l.label}</span>
-                </button>
-              ))}
-            </div>
+          {langs.map((l) => (
+            <button
+              key={l.code}
+              type="button"
+              className={`lang-option${l.code === value ? " active" : ""}`}
+              onClick={() => {
+                onChange(l.code);
+                setOpen(false);
+              }}
+            >
+              <span className="lang-option-code">{l.code}</span>
+              <span className="lang-option-label">{l.label}</span>
+            </button>
           ))}
         </div>
       )}
