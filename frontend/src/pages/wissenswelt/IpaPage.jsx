@@ -117,7 +117,7 @@ export default function IpaPage() {
         <Link to="/wissenswelt" className="wissen-breadcrumb">
           ← Wissenswelt
         </Link>
-        <span className="wissen-kicker">Wissenswelt · Lautschrift</span>
+        <span className="wissen-kicker">Wissenswelt · Aussprache</span>
         <h1>IPA – Lautschrift</h1>
         <p className="wissen-lead">
           Das Internationale Phonetische Alphabet: ein Zeichensatz, der
@@ -246,7 +246,9 @@ export default function IpaPage() {
             <span className="wissen-example-tag">Standard</span>
           </span>
           <span className="wissen-example-ipa">[ˈlʊstɪç]</span>
-          <span className="wissen-example-gloss">reimt auf möglich [ˈmøːklɪç]</span>
+          <span className="wissen-example-gloss">
+            reimt auf möglich [ˈmøːklɪç]
+          </span>
         </div>
         <div className="wissen-example-row">
           <span className="wissen-example-word">
@@ -263,11 +265,11 @@ export default function IpaPage() {
         Spricht jemand das <em>g</em> hingegen hart aus –{" "}
         <span className="ipa-symbol">[ˈlʊstɪk]</span>, wie in weiten Teilen
         Süddeutschlands, Österreichs und der Schweiz –, ist der Reim auf{" "}
-        <em>möglich</em> dahin. Beide Aussprachen sind völlig korrekt; sie führen
-        nur zu verschiedenen Reimen. Genau diese Vielstimmigkeit ist eine der
-        größten Hürden, die eine algorithmische Reimsuche grundsätzlich nicht
-        auflösen kann: Sie muss sich für eine Lesart entscheiden – und liegt
-        damit für einen Teil der Sprecher zwangsläufig daneben.
+        <em>möglich</em> dahin. Beide Aussprachen sind völlig korrekt; sie
+        führen nur zu verschiedenen Reimen. Genau diese Vielstimmigkeit ist eine
+        der größten Hürden, die eine algorithmische Reimsuche grundsätzlich
+        nicht auflösen kann: Sie muss sich für eine Lesart entscheiden – und
+        liegt damit für einen Teil der Sprecher zwangsläufig daneben.
       </p>
 
       {/* ── Tipp ── */}

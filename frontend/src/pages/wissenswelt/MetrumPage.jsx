@@ -232,7 +232,7 @@ export default function MetrumPage() {
         <Link to="/wissenswelt" className="wissen-breadcrumb">
           ← Wissenswelt
         </Link>
-        <span className="wissen-kicker">Wissenswelt · Rhythmus</span>
+        <span className="wissen-kicker">Wissenswelt · Betonung</span>
         <h1>Metrum &amp; Rhythmus</h1>
         <p className="wissen-lead">
           Der Herzschlag der Sprache: vier klassische Versfüße, mit Punkten

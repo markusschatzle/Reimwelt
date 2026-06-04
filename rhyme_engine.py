@@ -783,7 +783,6 @@ def find_rhymes(
         # ----------------------------------------------------------------
         # Step 1 — look up the search word in the DB
         # ----------------------------------------------------------------
-        used_case_fallback = False
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(
                 """
@@ -811,8 +810,6 @@ def find_rhymes(
                     {"word": word, "lang": source_lang},
                 )
                 row = cur.fetchone()
-                if row is not None:
-                    used_case_fallback = True
 
         search_ipa: str | None = row["ipa"] if row else None
         search_rhyme_part: str | None = row["rhyme_part"] if row else None
@@ -859,16 +856,6 @@ def find_rhymes(
         # inconsistently in the Kaikki source (e.g. 'ər' vs 'ɐ') don't
         # prevent candidates from being found.
         search_rhyme_part = normalize_rhyme_ipa(search_rhyme_part, source_lang)
-
-        # Case-insensitive fallback: the user typed a different capitalisation
-        # (e.g. "tenor" instead of "Tenor"). The DB entry carries the primary
-        # stress pattern of the correctly-spelled word, which may produce a long
-        # rhyme_part (e.g. "eːnoːr" for the trochee "ˈteːnoːr") and thus very
-        # few results. Collapse to the minimal suffix so the search behaves like
-        # the iambic / end-stressed reading instead — broader and more useful.
-        # We do NOT do this for exact matches: "Tenor" stays trochee-precise.
-        if used_case_fallback:
-            search_rhyme_part = _minimal_suffix(search_rhyme_part)
 
         # ----------------------------------------------------------------
         # Step 4 — fetch candidates
