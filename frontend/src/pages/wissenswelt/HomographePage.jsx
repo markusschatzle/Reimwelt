@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { MeterDots, InfoIcon, WissenToc } from "./_widgets.jsx";
+import reimIcon from "../../icons/Reim.svg";
+import ipaIcon from "../../icons/IPA.svg";
 
 // Table-of-contents entries — `id` matches the matching <h2 id> below.
 const SECTIONS = [
@@ -199,10 +201,10 @@ export default function HomographePage() {
           <p className="wissen-also-title">Siehe auch</p>
           <div className="wissen-also-links">
             <Link to="/wissenswelt/reimen" className="wissen-also-link">
-              🎵 Was ist ein Reim?
+              <img src={reimIcon} alt="" /> Was ist ein Reim?
             </Link>
             <Link to="/wissenswelt/ipa" className="wissen-also-link">
-              🔊 IPA – Lautschrift
+              <img src={ipaIcon} alt="" /> IPA – Lautschrift
             </Link>
             <Link to="/wissenswelt" className="wissen-also-link">
               ← Wissenswelt

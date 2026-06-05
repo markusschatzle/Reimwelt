@@ -1,6 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { WissenToc } from "./_widgets.jsx";
+import reimIcon from "../../icons/Reim.svg";
+import homographIcon from "../../icons/Homograph.svg";
+import metrumIcon from "../../icons/Metrum.svg";
+import ipaIcon from "../../icons/IPA.svg";
 
 // Table-of-contents entries — `id` matches the matching <h2 id> below.
 const SECTIONS = [
@@ -43,19 +47,20 @@ export default function WissensweltPage() {
           wichtig ist.
         </p>
         <p>
-          Die Ergebnisse werden nach drei Kriterien sortierbar gemacht: nach
-          Reimreinheit, nach Wortfrequenz (Wie gebräuchlich ist das Wort?) oder
-          nach einer ausgewogenen Kombination beider Werte.
+          Die Ergebnisse werden nach vier Kriterien sortierbar gemacht:
+          alphabetisch, nach Reimreinheit, nach Wortfrequenz (Wie gebräuchlich
+          ein Wort ist) oder nach einer ausgewogenen Kombination beider Werte.
         </p>
 
         {/* ── Die Daten ── */}
         <h2 id="die-daten">Die Daten</h2>
         <p>
-          Die Datenbank enthält mehrere hunderttausend Wörter aus verschiedenen
-          Sprachen. Die Grundlage bildet <strong>Wiktionary</strong> – ein
-          freies kollaboratives Wörterbuch – ergänzt um Frequenzdaten aus
-          Textkorpora (Untertitel, Webtext) und Informationen zu Wortform,
-          Flexion und Wortart.
+          Die Datenbank enthält mehrere hunderttausend Wörter aus Deutsch und
+          Englisch. Die Einbindung von weiteren Sprachen sind geplant. Die
+          Grundlage bildet <strong>Wiktionary</strong> – ein freies
+          kollaboratives Wörterbuch – ergänzt um Frequenzdaten aus Textkorpora
+          (Untertitel, Webtext) und Informationen zu Wortform, Flexion und
+          Wortart.
         </p>
         <p>
           Die IPA-Transkriptionen stammen aus zwei Quellen: Wo Wiktionary eine
@@ -72,15 +77,15 @@ export default function WissensweltPage() {
         <ul>
           <li>
             <strong>Sprachübergreifende Reime</strong> – z. B. deutsches Wort
-            mit englischem oder französischem Pendant
+            mit englischem Pendant
           </li>
           <li>
             <strong>Filterung nach Silbenzahl</strong>, Wortart (Nomen, Verb,
             Adjektiv …) und Metrum (Jambus, Trochäus …)
           </li>
           <li>
-            <strong>Drei Sortiermodi</strong>: Ausgewogen, Reimreinheit,
-            Häufigkeit
+            <strong>Vier Sortiermodi</strong>: Ausgewogen, Reimreinheit,
+            Häufigkeit und alphabetisch
           </li>
           <li>
             <strong>Wortdetails</strong> auf Knopfdruck: IPA, Betonungsmuster,
@@ -152,7 +157,7 @@ export default function WissensweltPage() {
         <div className="wissen-cards-grid">
           <Link to="/wissenswelt/reimen" className="wissen-card">
             <span className="wissen-card-icon" aria-hidden="true">
-              🎵
+              <img src={reimIcon} alt="" />
             </span>
             <span className="wissen-card-title">Was ist ein Reim?</span>
             <span className="wissen-card-desc">
@@ -163,7 +168,7 @@ export default function WissensweltPage() {
 
           <Link to="/wissenswelt/homographe" className="wissen-card">
             <span className="wissen-card-icon" aria-hidden="true">
-              🔤
+              <img src={homographIcon} alt="" />
             </span>
             <span className="wissen-card-title">Homographe</span>
             <span className="wissen-card-desc">
@@ -174,7 +179,7 @@ export default function WissensweltPage() {
 
           <Link to="/wissenswelt/metrum" className="wissen-card">
             <span className="wissen-card-icon" aria-hidden="true">
-              🎼
+              <img src={metrumIcon} alt="" style={{ height: "1.1rem" }} />
             </span>
             <span className="wissen-card-title">Metrum &amp; Rhythmus</span>
             <span className="wissen-card-desc">
@@ -185,7 +190,7 @@ export default function WissensweltPage() {
 
           <Link to="/wissenswelt/ipa" className="wissen-card">
             <span className="wissen-card-icon" aria-hidden="true">
-              🔊
+              <img src={ipaIcon} alt="" />
             </span>
             <span className="wissen-card-title">IPA – Lautschrift</span>
             <span className="wissen-card-desc">

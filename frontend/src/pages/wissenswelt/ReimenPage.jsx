@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { WissenToc } from "./_widgets.jsx";
+import metrumIcon from "../../icons/Metrum.svg";
+import ipaIcon from "../../icons/IPA.svg";
 
 // Table-of-contents entries — `id` matches the matching <h2 id> below.
 const SECTIONS = [
@@ -220,10 +222,10 @@ export default function ReimenPage() {
           <p className="wissen-also-title">Siehe auch</p>
           <div className="wissen-also-links">
             <Link to="/wissenswelt/metrum" className="wissen-also-link">
-              🎼 Metrum &amp; Rhythmus
+              <img src={metrumIcon} alt="" style={{ height: "0.65rem" }} /> Metrum &amp; Rhythmus
             </Link>
             <Link to="/wissenswelt/ipa" className="wissen-also-link">
-              🔊 IPA – Lautschrift
+              <img src={ipaIcon} alt="" /> IPA – Lautschrift
             </Link>
             <Link to="/wissenswelt" className="wissen-also-link">
               ← Wissenswelt

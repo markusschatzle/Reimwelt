@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { InfoIcon, WissenToc } from "./_widgets.jsx";
+import homographIcon from "../../icons/Homograph.svg";
+import metrumIcon from "../../icons/Metrum.svg";
 
 // Table-of-contents entries — `id` matches the matching <h2 id> below.
 const SECTIONS = [
@@ -311,10 +313,10 @@ export default function IpaPage() {
           <p className="wissen-also-title">Siehe auch</p>
           <div className="wissen-also-links">
             <Link to="/wissenswelt/homographe" className="wissen-also-link">
-              🔤 Homographe
+              <img src={homographIcon} alt="" /> Homographe
             </Link>
             <Link to="/wissenswelt/metrum" className="wissen-also-link">
-              🎼 Metrum &amp; Rhythmus
+              <img src={metrumIcon} alt="" style={{ height: "0.65rem" }} /> Metrum &amp; Rhythmus
             </Link>
             <Link to="/wissenswelt" className="wissen-also-link">
               ← Wissenswelt

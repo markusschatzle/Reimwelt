@@ -1,4 +1,5 @@
 import React, { useMemo, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { METER_LABELS } from "../constants.js";
 
 function StressPattern({ pattern }) {
@@ -105,7 +106,7 @@ export default function WordDetailPanel({
     return Array.isArray(detailData.definitions) ? detailData.definitions : [];
   }, [detailData]);
 
-  return (
+  return createPortal(
     <>
       <div
         className={`detail-overlay${isOpen ? " visible" : ""}`}
@@ -314,6 +315,7 @@ export default function WordDetailPanel({
           )}
         </div>
       </div>
-    </>
+    </>,
+    document.body,
   );
 }

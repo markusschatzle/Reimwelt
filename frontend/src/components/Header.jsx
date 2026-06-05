@@ -79,7 +79,7 @@ export default function Header() {
 
   return (
     <header className="header">
-      <div className="logo">Reimwelt.de</div>
+      <NavLink to="/reime" className="logo">Reimwelt.de</NavLink>
 
       {/* Desktop nav */}
       <nav className="header-nav" aria-label="Hauptnavigation">
