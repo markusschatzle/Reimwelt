@@ -25,6 +25,7 @@ import psycopg2.extras
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 load_dotenv()
@@ -287,4 +288,61 @@ async def post_endings(req: EndingsRequest) -> dict[str, Any]:
         "results": results,
         "meta": {"total": len(results)},
     }
+
+
+# ---------------------------------------------------------------------------
+# GET /api/top-words/{lang}
+# Frequency-ranked lemma list for programmatic-SEO static generation
+# (Next.js generateStaticParams + sitemap). Words only, deduped across POS.
+# ---------------------------------------------------------------------------
+
+_DEFAULT_TOP_POS = ["noun", "verb", "adj", "adv"]
+
+_TOP_WORDS_SQL = """
+SELECT word, MAX(frequency_score) AS f
+FROM words
+WHERE language = %(lang)s
+  AND frequency_score > 0
+  AND is_ghost_word = FALSE
+  AND is_multiword = FALSE
+  AND is_inflected_form = FALSE
+  AND pos = ANY(%(pos)s)
+GROUP BY word
+ORDER BY f DESC
+LIMIT %(limit)s
+"""
+
+@app.get("/api/top-words/{lang}")
+async def get_top_words(
+    lang: str,
+    limit: int = Query(1000, ge=1, le=100000),
+    pos: str | None = Query(None, description="Comma-separated POS filter"),
+) -> JSONResponse:
+    pos_list = (
+        [p.strip() for p in pos.split(",") if p.strip()] if pos else _DEFAULT_TOP_POS
+    )
+
+    try:
+        conn = _word_detail_conn()
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    try:
+        with conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    _TOP_WORDS_SQL,
+                    {"lang": lang, "pos": pos_list, "limit": limit},
+                )
+                rows = cur.fetchall()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"DB query failed: {exc}") from exc
+    finally:
+        conn.close()
+
+    words = [row["word"] for row in rows]
+    return JSONResponse(
+        content={"lang": lang, "count": len(words), "words": words},
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
 

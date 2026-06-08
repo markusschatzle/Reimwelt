@@ -1,0 +1,31 @@
+import "../src/styles.css";
+import { ThemeProvider } from "../src/ThemeContext.jsx";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reimwelt.de";
+
+export const metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Reimwelt – phonetische Reimsuche",
+    template: "%s · Reimwelt",
+  },
+  description:
+    "Reimwelt findet phonetisch passende Reime auf deutsche und englische Wörter – mit Lautschrift, Metrum und Worthäufigkeit.",
+  icons: { icon: "/icons/favicon.svg" },
+};
+
+// Set <html data-theme> before paint so there is no flash of the wrong theme.
+const themeScript = `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();`;
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="de" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}

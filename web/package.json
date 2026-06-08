@@ -1,0 +1,20 @@
+{
+  "name": "reimwelt-web",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev -p 5173",
+    "build": "next build",
+    "build:priority": "cross-env SSG_WORD_LIMIT=1000 next build",
+    "build:full": "cross-env SSG_WORD_LIMIT=10000 next build",
+    "start": "next start -p 3000"
+  },
+  "dependencies": {
+    "next": "^14.2.15",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  }
+}
