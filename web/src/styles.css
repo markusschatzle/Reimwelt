@@ -1111,7 +1111,10 @@ body {
 
 .results-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  /* minmax(0, 1fr) — not the default minmax(auto, 1fr) — so columns can shrink
+     below their longest word instead of forcing the grid wider than its
+     container. Long words then wrap inside the chip (see .chip-word). */
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0;
 }
 
@@ -1132,6 +1135,8 @@ body {
   flex-direction: row;
   align-items: center;
   gap: 8px;
+  min-width: 0; /* allow the chip to shrink within a grid cell */
+  max-width: 100%; /* and never overflow when wrapped (mobile flex layout) */
   padding: 8px 10px;
   cursor: pointer;
   position: relative;
@@ -1154,6 +1159,8 @@ body {
   color: var(--text);
   line-height: 1.25;
   letter-spacing: -0.01em;
+  min-width: 0; /* let the text shrink within the flex/grid cell */
+  overflow-wrap: anywhere; /* wrap long compounds instead of overflowing */
 }
 
 .chip-ipa {
