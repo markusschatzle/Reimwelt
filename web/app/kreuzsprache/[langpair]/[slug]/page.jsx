@@ -120,7 +120,6 @@ export default async function CrossWordPage({ params }) {
       <Breadcrumbs items={crumbs} />
       <header className="seo-head">
         <h1 className="seo-h1">{h1}</h1>
-        {detail.ipa && <p className="seo-ipa">[{detail.ipa}]</p>}
       </header>
 
       <ReimePage

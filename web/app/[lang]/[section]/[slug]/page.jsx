@@ -225,12 +225,10 @@ export default async function DetailPage({ params }) {
 
   const rhymeData = await getRhymes(word, lang);
   const results = rhymeData.results || [];
-  const ranked = deduplicateResults(sortResults(results, "balanced"));
-  const topLinks = ranked.slice(0, 24);
 
-  const definitions = Array.isArray(detail.definitions)
-    ? detail.definitions.slice(0, 5)
-    : [];
+  const firstDef = Array.isArray(detail.definitions)
+    ? detail.definitions[0]
+    : null;
   const synonyms = toWordList(detail.synonyms, 12);
   const antonyms = toWordList(detail.antonyms, 12);
 
@@ -249,7 +247,7 @@ export default async function DetailPage({ params }) {
       "@type": "DefinedTerm",
       name: word,
       inLanguage: lang,
-      description: definitions[0] || h1,
+      description: firstDef || h1,
       url: rhymePath(lang, word),
       ...(detail.ipa ? { alternateName: `[${detail.ipa}]` } : {}),
     },
@@ -261,7 +259,6 @@ export default async function DetailPage({ params }) {
       <Breadcrumbs items={crumbs} />
       <header className="seo-head">
         <h1 className="seo-h1">{h1}</h1>
-        {detail.ipa && <p className="seo-ipa">[{detail.ipa}]</p>}
       </header>
 
       {/* Interactive search island — server-rendered with seeded results, then
@@ -276,7 +273,8 @@ export default async function DetailPage({ params }) {
         initialRelated={{ synonyms, antonyms }}
       />
 
-      {/* Complementary SEO content: real HTML, crawlable internal links. */}
+      {/* Complementary SEO content. Synonyms/antonyms are shown by the island
+          above (RelatedWords); here we keep only the cross-language link. */}
       <section className="seo-prose" aria-label={`Über ${word}`}>
         {(posLabel || detail.gender) && (
           <p className="seo-meta">
@@ -285,40 +283,9 @@ export default async function DetailPage({ params }) {
           </p>
         )}
 
-        {definitions.length > 0 && (
-          <div className="seo-block">
-            <h2>{lang === "en" ? "Meaning" : "Bedeutung"}</h2>
-            <dl className="seo-defs">
-              {definitions.map((def, i) => (
-                <div key={i} className="seo-def-row">
-                  <dt>{i + 1}.</dt>
-                  <dd>{def}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        )}
-
-        {topLinks.length > 0 && (
-          <nav className="seo-block" aria-label="Verwandte Reime">
-            <h2>
-              {lang === "en"
-                ? `Top rhymes for “${word}”`
-                : `Top-Reime auf „${word}“`}
-            </h2>
-            <ul className="seo-link-list">
-              {topLinks.map((r) => (
-                <li key={`${r.word}-${r.language}`}>
-                  <Link href={rhymePath(lang, r.word)}>{r.word}</Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        )}
-
-        <p className="seo-meta">
+        <p className="seo-cross-link">
           <Link href={crossPath(lang, otherLang, word)}>
-            {crossShortLabel(lang, otherLang, word)}
+            {crossShortLabel(lang, otherLang, word)} →
           </Link>
         </p>
       </section>

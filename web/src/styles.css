@@ -3575,11 +3575,6 @@ html.theme-transitioning *::after {
   font-weight: 700;
   margin: 0 0 0.25rem;
 }
-.seo-ipa {
-  margin: 0;
-  color: var(--text-secondary);
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-}
 .seo-prose {
   max-width: 760px;
   margin: 2.5rem auto 0;
@@ -3590,6 +3585,25 @@ html.theme-transitioning *::after {
   margin: 0 0 1rem;
   color: var(--text-muted);
   font-size: 0.85rem;
+}
+/* Inline links inside the SEO prose (cross-language link, back-link) —
+   theme-aware accent colour so they stay readable in dark mode. */
+.seo-meta a,
+.seo-cross-link a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+.seo-meta a:hover,
+.seo-cross-link a:hover {
+  color: var(--accent-hover);
+  border-bottom-color: currentColor;
+}
+.seo-cross-link {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 .seo-block {
   margin-bottom: 1.75rem;
