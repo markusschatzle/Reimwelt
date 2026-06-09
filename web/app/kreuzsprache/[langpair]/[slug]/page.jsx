@@ -14,7 +14,7 @@ import {
   deduplicateResults,
   toWordList,
 } from "../../../../src/utils.js";
-import { breadcrumbList } from "../../../../src/seo.js";
+import { breadcrumbList, OG_IMAGE } from "../../../../src/seo.js";
 import {
   serverFetchWordDetail,
   serverSearchRhymes,
@@ -74,7 +74,7 @@ export async function generateMetadata({ params }) {
     description,
     alternates: { canonical: crossPath(pair.src, pair.tgt, word) },
     robots: { index: hasResults, follow: true },
-    openGraph: { title, description, type: "article" },
+    openGraph: { title, description, type: "article", images: [OG_IMAGE] },
   };
 }
 

@@ -18,7 +18,7 @@ import {
   deduplicateResults,
   toWordList,
 } from "../../../../src/utils.js";
-import { breadcrumbList } from "../../../../src/seo.js";
+import { breadcrumbList, OG_IMAGE } from "../../../../src/seo.js";
 import {
   serverFetchWordDetail,
   serverSearchRhymes,
@@ -115,7 +115,7 @@ export async function generateMetadata({ params }) {
       description,
       alternates: { canonical: rhymePath(lang, word) },
       robots: { index: true, follow: true },
-      openGraph: { title, description, type: "article" },
+      openGraph: { title, description, type: "article", images: [OG_IMAGE] },
     };
   }
 
@@ -131,7 +131,7 @@ export async function generateMetadata({ params }) {
     description,
     alternates: { canonical: endingPath(lang, word) },
     robots: { index: true, follow: true },
-    openGraph: { title, description, type: "article" },
+    openGraph: { title, description, type: "article", images: [OG_IMAGE] },
   };
 }
 

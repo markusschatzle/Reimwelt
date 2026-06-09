@@ -1,5 +1,6 @@
 import "../src/styles.css";
 import { ThemeProvider } from "../src/ThemeContext.jsx";
+import { OG_IMAGE } from "../src/seo.js";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reimwelt.de";
 
@@ -12,6 +13,17 @@ export const metadata = {
   description:
     "Reimwelt findet phonetisch passende Reime auf deutsche und englische Wörter – mit Lautschrift, Metrum und Worthäufigkeit.",
   icons: { icon: "/icons/favicon.svg" },
+  // Default social-share metadata; pages that set their own openGraph re-include
+  // OG_IMAGE so the preview image is present everywhere.
+  openGraph: {
+    type: "website",
+    siteName: "Reimwelt",
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [OG_IMAGE.url],
+  },
 };
 
 // Set <html data-theme> before paint so there is no flash of the wrong theme.
