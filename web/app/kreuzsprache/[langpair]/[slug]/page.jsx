@@ -9,12 +9,18 @@ import {
   isSafeSlug,
 } from "../../../../src/routes.js";
 import { crossTitle, crossDescription } from "../../../../src/cross.js";
-import { sortResults, deduplicateResults } from "../../../../src/utils.js";
+import {
+  sortResults,
+  deduplicateResults,
+  toWordList,
+} from "../../../../src/utils.js";
+import { breadcrumbList } from "../../../../src/seo.js";
 import {
   serverFetchWordDetail,
   serverSearchRhymes,
   fetchTopWords,
 } from "../../../../src/server-api.js";
+import Breadcrumbs from "../../../../src/components/Breadcrumbs.jsx";
 import ReimePage from "../../../../src/views/ReimePage.jsx";
 
 export const dynamicParams = true;
@@ -85,7 +91,7 @@ export default async function CrossWordPage({ params }) {
   const linkWords = ranked.slice(0, 40);
   const h1 = crossTitle(pair.src, pair.tgt, word);
 
-  const jsonLd = {
+  const itemList = {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: h1,
@@ -99,8 +105,19 @@ export default async function CrossWordPage({ params }) {
     })),
   };
 
+  const crumbs = [
+    { name: "Reimwelt", href: rhymePath(pair.src) },
+    {
+      name: pair.src === "de" ? "Kreuzsprache" : "Cross-language",
+      href: crossPath(pair.src, pair.tgt),
+    },
+    { name: word, href: crossPath(pair.src, pair.tgt, word) },
+  ];
+  const jsonLd = [itemList, breadcrumbList(crumbs)];
+
   return (
     <article className="word-page">
+      <Breadcrumbs items={crumbs} />
       <header className="seo-head">
         <h1 className="seo-h1">{h1}</h1>
         {detail.ipa && <p className="seo-ipa">[{detail.ipa}]</p>}
@@ -116,6 +133,10 @@ export default async function CrossWordPage({ params }) {
         initialResults={results}
         initialQueryMeta={data.query}
         initialMeta={data.meta}
+        initialRelated={{
+          synonyms: toWordList(detail.synonyms, 12),
+          antonyms: toWordList(detail.antonyms, 12),
+        }}
       />
 
       <section className="seo-prose" aria-label={h1}>

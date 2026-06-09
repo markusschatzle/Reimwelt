@@ -9,6 +9,7 @@ import {
   canonicalKey,
   formRank,
   deduplicateResults,
+  toWordList,
 } from "../utils.js";
 
 import LangDropdown from "../components/LangDropdown.jsx";
@@ -19,6 +20,7 @@ import SkeletonGrid from "../components/SkeletonGrid.jsx";
 import ResultsMeta from "../components/ResultsMeta.jsx";
 import EmptyState from "../components/EmptyState.jsx";
 import WordDetailPanel from "../components/WordDetailPanel.jsx";
+import RelatedWords from "../components/RelatedWords.jsx";
 
 // ---------------------------------------------------------------------------
 // Lock icons
@@ -68,6 +70,7 @@ export default function ReimePage({
   initialResults = null,
   initialQueryMeta = null,
   initialMeta = null,
+  initialRelated = null,
 }) {
   // Search state. sourceLang/targetLang default to `lang` (same-language search);
   // the cross-language pages pass distinct source/target with the lock off.
@@ -88,6 +91,10 @@ export default function ReimePage({
   const [hasSearched, setHasSearched] = useState(initialResults != null);
   const [meterFilter, setMeterFilter] = useState(null);
   const [posFilter, setPosFilter] = useState(null);
+
+  // Synonyms/antonyms of the searched word (internal-linking component below
+  // the results). Seeded from SSR on word pages; refetched on live searches.
+  const [related, setRelated] = useState(initialRelated);
 
   // Detail panel state
   const [selectedWord, setSelectedWord] = useState(null);
@@ -153,21 +160,35 @@ export default function ReimePage({
       setError(null);
       setMeterFilter(null);
       setPosFilter(null);
+      setRelated(null);
 
       try {
-        const data = await searchRhymes({
-          word: q,
-          source_lang: sourceLang,
-          target_langs: [targetLang],
-          sort_mode: sortMode.startsWith("alpha")
-            ? "balanced"
-            : sortMode.split("_")[0],
-          limit: 500,
-        });
+        // Fetch rhymes and the searched word's detail (for synonyms/antonyms)
+        // in parallel; a missing word just yields no related words.
+        const [data, detail] = await Promise.all([
+          searchRhymes({
+            word: q,
+            source_lang: sourceLang,
+            target_langs: [targetLang],
+            sort_mode: sortMode.startsWith("alpha")
+              ? "balanced"
+              : sortMode.split("_")[0],
+            limit: 500,
+          }),
+          fetchWordDetail(q, sourceLang).catch(() => null),
+        ]);
         setBaseResults(data.results || []);
         setQueryMeta(data.query || null);
         setMeta(data.meta || null);
         setHasSearched(true);
+        setRelated(
+          detail
+            ? {
+                synonyms: toWordList(detail.synonyms),
+                antonyms: toWordList(detail.antonyms),
+              }
+            : null,
+        );
       } catch (err) {
         setError(err.message || "Unbekannter Fehler");
         setBaseResults([]);
@@ -314,6 +335,15 @@ export default function ReimePage({
           )
         )}
       </div>
+
+      {/* Synonyms / antonyms of the searched word — internal linking */}
+      {!loading && related && (
+        <RelatedWords
+          synonyms={related.synonyms}
+          antonyms={related.antonyms}
+          lang={sourceLang}
+        />
+      )}
 
       {/* Word detail panel */}
       <WordDetailPanel

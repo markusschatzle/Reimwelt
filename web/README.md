@@ -8,8 +8,9 @@ It talks to the existing FastAPI backend (`../api.py`) over HTTP. The old Vite S
 in `../frontend` is kept runnable until cutover; this app supersedes it.
 
 > **Status.** Phase 1 (migration + **word pages**), Phase 2 (**ending pages**)
-> and Phase 3 (**cross-language pages**) are implemented. The wider schema /
-> internal-linking program is a later phase (see `../CLAUDE.md` and the plan).
+> and Phase 3 (**cross-language pages**) are implemented, plus breadcrumb
+> structured data and a synonyms/antonyms internal-linking component. English
+> localization of the static/Wissenswelt pages remains (see `../CLAUDE.md`).
 
 ---
 

@@ -1,4 +1,28 @@
 // ---------------------------------------------------------------------------
+// Misc helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalise a synonyms/antonyms field (array of strings or {word}/{sense}
+ * objects, possibly with duplicates) into a deduped list of plain words.
+ */
+export function toWordList(arr, limit = 24) {
+  if (!Array.isArray(arr)) return [];
+  const seen = new Set();
+  const out = [];
+  for (const s of arr) {
+    const w = typeof s === "string" ? s : (s && (s.word || s.sense)) || "";
+    const trimmed = String(w).trim();
+    if (trimmed && !seen.has(trimmed)) {
+      seen.add(trimmed);
+      out.push(trimmed);
+      if (out.length >= limit) break;
+    }
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
 // Dedup helpers
 // ---------------------------------------------------------------------------
 

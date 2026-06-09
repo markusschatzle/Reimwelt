@@ -13,8 +13,13 @@ import {
   crossPath,
 } from "../../../../src/routes.js";
 import { crossShortLabel } from "../../../../src/cross.js";
-import { sortResults, deduplicateResults } from "../../../../src/utils.js";
+import {
+  sortResults,
+  deduplicateResults,
+  toWordList,
+} from "../../../../src/utils.js";
 import { POS_LABELS } from "../../../../src/constants.js";
+import { breadcrumbList } from "../../../../src/seo.js";
 import {
   serverFetchWordDetail,
   serverSearchRhymes,
@@ -22,6 +27,7 @@ import {
   fetchTopWords,
   fetchTopEndings,
 } from "../../../../src/server-api.js";
+import Breadcrumbs from "../../../../src/components/Breadcrumbs.jsx";
 import ReimePage from "../../../../src/views/ReimePage.jsx";
 import EndungenPage from "../../../../src/views/EndungenPage.jsx";
 
@@ -149,21 +155,34 @@ export default async function DetailPage({ params }) {
     const h1 =
       lang === "en" ? `Words ending in “-${word}”` : `Wörter auf „-${word}“`;
 
-    const jsonLd = {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      name: h1,
-      numberOfItems: linkWords.length,
-      itemListElement: linkWords.map((r, i) => ({
-        "@type": "ListItem",
-        position: i + 1,
-        name: r.word,
-        url: rhymePath(lang, r.word),
-      })),
-    };
+    const crumbs = [
+      { name: "Reimwelt", href: rhymePath(lang) },
+      {
+        name: lang === "en" ? "Endings" : "Endungen",
+        href: endingPath(lang),
+      },
+      { name: `-${word}`, href: endingPath(lang, word) },
+    ];
+
+    const jsonLd = [
+      {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: h1,
+        numberOfItems: linkWords.length,
+        itemListElement: linkWords.map((r, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: r.word,
+          url: rhymePath(lang, r.word),
+        })),
+      },
+      breadcrumbList(crumbs),
+    ];
 
     return (
       <article className="word-page">
+        <Breadcrumbs items={crumbs} />
         <header className="seo-head">
           <h1 className="seo-h1">{h1}</h1>
         </header>
@@ -212,27 +231,34 @@ export default async function DetailPage({ params }) {
   const definitions = Array.isArray(detail.definitions)
     ? detail.definitions.slice(0, 5)
     : [];
-  const synonyms = (Array.isArray(detail.synonyms) ? detail.synonyms : [])
-    .map((s) => (typeof s === "string" ? s : s.word || ""))
-    .filter(Boolean)
-    .slice(0, 12);
+  const synonyms = toWordList(detail.synonyms, 12);
+  const antonyms = toWordList(detail.antonyms, 12);
 
   const h1 = lang === "en" ? `Rhymes for “${word}”` : `Reime auf „${word}“`;
   const posLabel = detail.pos ? POS_LABELS[detail.pos] || detail.pos : null;
   const otherLang = lang === "de" ? "en" : "de"; // for the cross-language link
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "DefinedTerm",
-    name: word,
-    inLanguage: lang,
-    description: definitions[0] || h1,
-    url: rhymePath(lang, word),
-    ...(detail.ipa ? { alternateName: `[${detail.ipa}]` } : {}),
-  };
+  const crumbs = [
+    { name: "Reimwelt", href: rhymePath(lang) },
+    { name: word, href: rhymePath(lang, word) },
+  ];
+
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "DefinedTerm",
+      name: word,
+      inLanguage: lang,
+      description: definitions[0] || h1,
+      url: rhymePath(lang, word),
+      ...(detail.ipa ? { alternateName: `[${detail.ipa}]` } : {}),
+    },
+    breadcrumbList(crumbs),
+  ];
 
   return (
     <article className="word-page">
+      <Breadcrumbs items={crumbs} />
       <header className="seo-head">
         <h1 className="seo-h1">{h1}</h1>
         {detail.ipa && <p className="seo-ipa">[{detail.ipa}]</p>}
@@ -247,6 +273,7 @@ export default async function DetailPage({ params }) {
         initialResults={results}
         initialQueryMeta={rhymeData.query}
         initialMeta={rhymeData.meta}
+        initialRelated={{ synonyms, antonyms }}
       />
 
       {/* Complementary SEO content: real HTML, crawlable internal links. */}
@@ -283,19 +310,6 @@ export default async function DetailPage({ params }) {
               {topLinks.map((r) => (
                 <li key={`${r.word}-${r.language}`}>
                   <Link href={rhymePath(lang, r.word)}>{r.word}</Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        )}
-
-        {synonyms.length > 0 && (
-          <nav className="seo-block" aria-label="Synonyme">
-            <h2>{lang === "en" ? "Synonyms" : "Synonyme"}</h2>
-            <ul className="seo-link-list">
-              {synonyms.map((s) => (
-                <li key={s}>
-                  <Link href={rhymePath(lang, s)}>{s}</Link>
                 </li>
               ))}
             </ul>
