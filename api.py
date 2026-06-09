@@ -104,6 +104,23 @@ def _serialise_result(r: Any) -> dict[str, Any]:
     return dict(r)
 
 
+# Sense register tags marking non-standard usage. When reconstructing
+# synonyms/antonyms from raw_kaikki senses we skip senses carrying these, so a
+# dated/slang sense (e.g. "warm" → "schwul") doesn't pollute everyday results.
+# Grammatical tags (masculine, strong, plural, …) are unaffected.
+_NONSTANDARD_SENSE_TAGS = frozenset({
+    "slang", "vulgar", "obscene", "offensive", "derogatory", "pejorative",
+    "slur", "ethnic-slur", "dated", "obsolete", "archaic", "humorous",
+})
+
+
+def _is_standard_sense(sense: Any) -> bool:
+    """True unless the sense is tagged with a non-standard register tag."""
+    if not isinstance(sense, dict):
+        return True
+    return not (_NONSTANDARD_SENSE_TAGS & set(sense.get("tags") or []))
+
+
 # ---------------------------------------------------------------------------
 # POST /api/rhymes
 # ---------------------------------------------------------------------------
@@ -194,6 +211,8 @@ async def get_word(word: str, lang: str = Query(..., min_length=2, max_length=10
             seen: set[str] = set()
             syns: list[str] = []
             for sense in senses:
+                if not _is_standard_sense(sense):
+                    continue
                 for s in (sense.get("synonyms") or []):
                     w = s.get("word") if isinstance(s, dict) else str(s)
                     if w and w not in seen:
@@ -205,6 +224,8 @@ async def get_word(word: str, lang: str = Query(..., min_length=2, max_length=10
             seen_a: set[str] = set()
             ants: list[str] = []
             for sense in senses:
+                if not _is_standard_sense(sense):
+                    continue
                 for a in (sense.get("antonyms") or []):
                     w = a.get("word") if isinstance(a, dict) else str(a)
                     if w and w not in seen_a:
