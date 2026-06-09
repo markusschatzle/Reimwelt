@@ -18,7 +18,6 @@ import {
   deduplicateResults,
   toWordList,
 } from "../../../../src/utils.js";
-import { POS_LABELS } from "../../../../src/constants.js";
 import { breadcrumbList } from "../../../../src/seo.js";
 import {
   serverFetchWordDetail,
@@ -233,7 +232,6 @@ export default async function DetailPage({ params }) {
   const antonyms = toWordList(detail.antonyms, 12);
 
   const h1 = lang === "en" ? `Rhymes for “${word}”` : `Reime auf „${word}“`;
-  const posLabel = detail.pos ? POS_LABELS[detail.pos] || detail.pos : null;
   const otherLang = lang === "de" ? "en" : "de"; // for the cross-language link
 
   const crumbs = [
@@ -276,13 +274,6 @@ export default async function DetailPage({ params }) {
       {/* Complementary SEO content. Synonyms/antonyms are shown by the island
           above (RelatedWords); here we keep only the cross-language link. */}
       <section className="seo-prose" aria-label={`Über ${word}`}>
-        {(posLabel || detail.gender) && (
-          <p className="seo-meta">
-            {posLabel}
-            {detail.gender ? ` · ${detail.gender}` : ""}
-          </p>
-        )}
-
         <p className="seo-cross-link">
           <Link href={crossPath(lang, otherLang, word)}>
             {crossShortLabel(lang, otherLang, word)} →

@@ -19,10 +19,18 @@ function StressPattern({ pattern }) {
   );
 }
 
+// wiktextract emits metadata markers in the inflection list (the table type
+// and a "no-table-tags" sentinel) that aren't real word forms — drop them.
+const JUNK_INFLECTION_TAGS = new Set(["table-tags", "inflection-template"]);
+
 function InflectionsTable({ inflections }) {
   if (!Array.isArray(inflections) || inflections.length === 0) return null;
   const rows = inflections
     .filter((inf) => inf && typeof inf === "object")
+    .filter((inf) => {
+      const tags = Array.isArray(inf.tags) ? inf.tags : [];
+      return !tags.some((t) => JUNK_INFLECTION_TAGS.has(t));
+    })
     .slice(0, 30);
   if (rows.length === 0) return null;
 

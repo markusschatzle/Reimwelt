@@ -138,18 +138,11 @@ export default async function CrossWordPage({ params }) {
         }}
       />
 
+      {/* The target-language rhymes are already shown in the results above, so
+          no visible list here; the ItemList JSON-LD below still enumerates them
+          (with URLs) for crawlers. */}
       <section className="seo-prose" aria-label={h1}>
-        <nav className="seo-block" aria-label={h1}>
-          <h2>{h1}</h2>
-          <ul className="seo-link-list">
-            {linkWords.map((r) => (
-              <li key={`${r.word}-${r.language}`}>
-                <Link href={rhymePath(pair.tgt, r.word)}>{r.word}</Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <p className="seo-meta">
+        <p className="seo-cross-link">
           <Link href={rhymePath(pair.src, word)}>
             {pair.src === "de"
               ? `Alle Reime auf „${word}“`
