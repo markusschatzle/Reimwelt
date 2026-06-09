@@ -75,7 +75,7 @@ function HighlightRhyme({ word }) {
 export default function WordChip({ result, onDetailClick, index }) {
   // Cap the stagger so result pages with hundreds of words don't take many
   // seconds to fully appear (the last chip lands at ~600ms, not index*30ms).
-  const delay = `${Math.min(index, 20) * 30}ms`;
+  const delay = `${Math.min(index, 100) * 30}ms`;
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const ref = useRef(null);

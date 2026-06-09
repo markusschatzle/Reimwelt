@@ -323,6 +323,13 @@ def _normalize_rhyme_ipa(rp: str, lang: str | None = None) -> str:
     # diphthong token (aɪ) is already recognised as a unit; keeping ̯ causes
     # mis-tokenisation and prevents LIKE suffix matches across languages.
     rp = rp.replace("\u032F", "")
+    # Syllabic consonants (C + U+0329) -> schwa + consonant.
+    # Kaikki data is inconsistent: "frozen" may store /frəʊzn̩/ while
+    # "unfrozen" stores /ʌnˈfrəʊzən/.  n̩ and ən are phonetically equivalent;
+    # normalising to schwa+consonant ensures LIKE suffix matching and purity
+    # scoring treat both forms identically.
+    for _cons in ("n", "l", "m", "r", "ŋ"):  # n l m r ng
+        rp = rp.replace(_cons + _SYLLABIC_MARK, "ə" + _cons)
     # Schwa + r (ər) → near-open central (ɐ)
     rp = rp.replace("\u0259r", "\u0250")
     if lang is not None:

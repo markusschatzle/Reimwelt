@@ -647,16 +647,29 @@ WHERE
     -- so stored 'aɪ̯ɐ' matches a normalised search suffix of 'aɪɐ', but ɐ
     -- is NOT collapsed to ə — keeping same-language rhymes strict.
     WHEN language = %(source_lang)s
-      THEN translate(rhyme_part, E'\\u032F', '')
+      THEN replace(replace(replace(replace(replace(
+               translate(rhyme_part, E'\\u032F', ''),
+               'n' || chr(809), chr(601) || 'n'),
+               'l' || chr(809), chr(601) || 'l'),
+               'm' || chr(809), chr(601) || 'm'),
+               'r' || chr(809), chr(601) || 'r'),
+               chr(331) || chr(809), chr(601) || chr(331))
              LIKE '%%' || translate(%(rhyme_suffix)s::text, E'\\u032F', '')
     -- Cross-language: additionally collapse ɐ→ə so that e.g. DE 'aɪ̯ɐ'
     -- matches EN 'aɪə' (fire / Eier).
     ELSE
-      translate(rhyme_part, E'\\u0250\\u032F', E'\\u0259')
+      replace(replace(replace(replace(replace(
+          translate(rhyme_part, E'\\u0250\\u032F', E'\\u0259'),
+          'n' || chr(809), chr(601) || 'n'),
+          'l' || chr(809), chr(601) || 'l'),
+          'm' || chr(809), chr(601) || 'm'),
+          'r' || chr(809), chr(601) || 'r'),
+          chr(331) || chr(809), chr(601) || chr(331))
         LIKE '%%' || translate(%(rhyme_suffix)s::text, E'\\u0250\\u032F', E'\\u0259')
   END
   AND language = ANY(%(target_langs)s)
   AND word NOT LIKE '%% %%'
+  AND word NOT LIKE '%%*%%'
   AND (%(include_multiword)s OR is_multiword = FALSE)
   AND is_ghost_word = FALSE
   AND (%(meter)s IS NULL            OR meter           = %(meter)s)
