@@ -1,0 +1,25 @@
+# systemd unit for the FastAPI backend (uvicorn).
+# Install: sudo cp deploy/reimwelt-api.service /etc/systemd/system/
+#          sudo systemctl daemon-reload && sudo systemctl enable --now reimwelt-api
+# Adjust User/paths to match your server. api.py loads /opt/reimwelt/.env itself
+# (python-dotenv), so DATABASE_URL etc. live there.
+
+[Unit]
+Description=Reimwelt FastAPI backend
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=reimwelt
+Group=reimwelt
+WorkingDirectory=/opt/reimwelt
+ExecStart=/opt/reimwelt/.venv/bin/uvicorn api:app --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=3
+# Hardening (optional)
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

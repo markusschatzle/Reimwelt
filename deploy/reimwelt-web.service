@@ -1,0 +1,28 @@
+# systemd unit for the Next.js frontend (next start, port 3000).
+# Install: sudo cp deploy/reimwelt-web.service /etc/systemd/system/
+#          sudo systemctl daemon-reload && sudo systemctl enable --now reimwelt-web
+#
+# Run `npm ci && npm run build` first (see DEPLOY.md). Next loads
+# /opt/reimwelt/web/.env.production at build AND runtime, so put
+# NEXT_PUBLIC_SITE_URL / INTERNAL_API_URL / SSG_* there.
+# ExecStart runs the next binary directly (cleaner SIGTERM handling than npm).
+# Ensure node is on PATH; the .bin/next shebang is `#!/usr/bin/env node`.
+
+[Unit]
+Description=Reimwelt Next.js frontend
+After=network.target reimwelt-api.service
+Wants=reimwelt-api.service
+
+[Service]
+Type=simple
+User=reimwelt
+Group=reimwelt
+WorkingDirectory=/opt/reimwelt/web
+Environment=NODE_ENV=production
+ExecStart=/opt/reimwelt/web/node_modules/.bin/next start -p 3000
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
