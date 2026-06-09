@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import { LANGS, POS_LABELS } from "../constants.js";
 import { searchRhymes, fetchWordDetail } from "../api.js";
@@ -71,7 +72,10 @@ export default function ReimePage({
   initialQueryMeta = null,
   initialMeta = null,
   initialRelated = null,
+  navigateOnSearch = null,
 }) {
+  const router = useRouter();
+
   // Search state. sourceLang/targetLang default to `lang` (same-language search);
   // the cross-language pages pass distinct source/target with the lock off.
   const [query, setQuery] = useState(initialWord);
@@ -156,6 +160,13 @@ export default function ReimePage({
       const q = (overrideQuery !== undefined ? overrideQuery : query).trim();
       if (!q) return;
 
+      // On an SEO detail page, a new search hands off to the live tool landing
+      // (which has no fixed heading) and runs the search there.
+      if (navigateOnSearch) {
+        router.push(`${navigateOnSearch}?q=${encodeURIComponent(q)}`);
+        return;
+      }
+
       setLoading(true);
       setError(null);
       setMeterFilter(null);
@@ -196,8 +207,19 @@ export default function ReimePage({
         setLoading(false);
       }
     },
-    [query, sourceLang, targetLang, sortMode],
+    [query, sourceLang, targetLang, sortMode, navigateOnSearch, router],
   );
+
+  // On the tool landing, pick up a ?q= handed off from an SEO page and search.
+  useEffect(() => {
+    if (navigateOnSearch || hasSearched) return;
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q && q.trim()) {
+      setQuery(q);
+      runSearch(q);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleKeyDown(e) {
     if (e.key === "Enter") runSearch();

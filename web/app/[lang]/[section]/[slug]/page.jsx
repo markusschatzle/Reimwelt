@@ -192,6 +192,7 @@ export default async function DetailPage({ params }) {
           initialSuffix={word}
           initialResults={results}
           initialMeta={data.meta}
+          navigateOnSearch={endingPath(lang)}
         />
 
         <section className="seo-prose" aria-label={h1}>
@@ -269,6 +270,7 @@ export default async function DetailPage({ params }) {
         initialQueryMeta={rhymeData.query}
         initialMeta={rhymeData.meta}
         initialRelated={{ synonyms, antonyms }}
+        navigateOnSearch={rhymePath(lang)}
       />
 
       {/* Complementary SEO content. Synonyms/antonyms are shown by the island

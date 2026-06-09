@@ -144,6 +144,7 @@ export default async function CrossWordPage({ params }) {
           synonyms: toWordList(detail.synonyms, 12),
           antonyms: toWordList(detail.antonyms, 12),
         }}
+        navigateOnSearch={crossPath(pair.src, pair.tgt)}
       />
 
       {/* The target-language rhymes are already shown in the results above, so

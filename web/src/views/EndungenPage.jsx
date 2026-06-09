@@ -7,6 +7,7 @@ import React, {
   useRef,
   useEffect,
 } from "react";
+import { useRouter } from "next/navigation";
 
 import { LANGS } from "../constants.js";
 import { searchEndings, fetchWordDetail } from "../api.js";
@@ -184,7 +185,10 @@ export default function EndungenPage({
   initialSuffix = "",
   initialResults = null,
   initialMeta = null,
+  navigateOnSearch = null,
 }) {
+  const router = useRouter();
+
   // Search state
   const [query, setQuery] = useState(initialSuffix);
   const [lang, setLang] = useState(initialLang);
@@ -267,6 +271,13 @@ export default function EndungenPage({
     async (overrideQuery, overrideAnywhere) => {
       const q = (overrideQuery !== undefined ? overrideQuery : query).trim();
       if (!q) return;
+
+      // On an SEO ending page, a new search hands off to the endings landing.
+      if (navigateOnSearch) {
+        router.push(`${navigateOnSearch}?q=${encodeURIComponent(q)}`);
+        return;
+      }
+
       const anywhereVal =
         overrideAnywhere !== undefined ? overrideAnywhere : anywhere;
 
@@ -293,12 +304,23 @@ export default function EndungenPage({
         setLoading(false);
       }
     },
-    [query, lang, anywhere],
+    [query, lang, anywhere, navigateOnSearch, router],
   );
 
   function handleKeyDown(e) {
     if (e.key === "Enter") runSearch();
   }
+
+  // On the endings landing, pick up a ?q= handed off from an SEO page.
+  useEffect(() => {
+    if (navigateOnSearch || hasSearched) return;
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q && q.trim()) {
+      setQuery(q);
+      runSearch(q);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Re-run when the language changes — but not on mount, so a server-seeded
   // ending page doesn't refetch over its SSR results during hydration.
