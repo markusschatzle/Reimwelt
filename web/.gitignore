@@ -10,6 +10,8 @@
 
 # env
 .env*.local
+# but DO track the template (overrides the root .gitignore's .env.* rule)
+!.env.local.example
 
 # debug
 npm-debug.log*
