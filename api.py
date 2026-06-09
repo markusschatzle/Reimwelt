@@ -362,6 +362,7 @@ WITH suffixes AS (
     WHERE language = %(lang)s
       AND is_ghost_word = FALSE
       AND is_multiword = FALSE
+      AND is_inflected_form = FALSE
       AND char_length(word) > n
 )
 SELECT ending, count(*) AS n
