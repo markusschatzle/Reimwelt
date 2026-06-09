@@ -3,8 +3,9 @@ import {
   ROUTE_SEGMENTS,
   ENDING_SEGMENTS,
   rhymePath,
+  endingPath,
 } from "../src/routes.js";
-import { fetchTopWords } from "../src/server-api.js";
+import { fetchTopWords, fetchTopEndings } from "../src/server-api.js";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://reimwelt.de";
 
@@ -42,12 +43,12 @@ export default async function sitemap() {
       });
     }
 
-    const limit = parseInt(
+    const wordLimit = parseInt(
       process.env.SITEMAP_WORD_LIMIT || process.env.SSG_WORD_LIMIT || "1000",
       10,
     );
     try {
-      const data = await fetchTopWords(lang, limit);
+      const data = await fetchTopWords(lang, wordLimit);
       for (const w of data.words || []) {
         entries.push({
           url: `${SITE}${rhymePath(lang, w)}`,
@@ -57,6 +58,23 @@ export default async function sitemap() {
       }
     } catch {
       // Backend unavailable — emit the landings/static pages only.
+    }
+
+    const endingLimit = parseInt(
+      process.env.SITEMAP_ENDING_LIMIT || process.env.SSG_ENDING_LIMIT || "200",
+      10,
+    );
+    try {
+      const data = await fetchTopEndings(lang, endingLimit);
+      for (const e of data.endings || []) {
+        entries.push({
+          url: `${SITE}${endingPath(lang, e)}`,
+          changeFrequency: "weekly",
+          priority: 0.5,
+        });
+      }
+    } catch {
+      // Backend unavailable — skip ending URLs.
     }
   }
 

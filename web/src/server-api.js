@@ -36,3 +36,23 @@ export async function fetchTopWords(lang, limit) {
   if (!res.ok) throw new Error(`top-words HTTP ${res.status}`);
   return res.json();
 }
+
+export async function serverSearchEndings(params) {
+  const res = await fetch(`${BASE}/api/endings`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+    next: { revalidate: REVALIDATE },
+  });
+  if (!res.ok) throw new Error(`endings HTTP ${res.status}`);
+  return res.json();
+}
+
+export async function fetchTopEndings(lang, limit) {
+  const res = await fetch(
+    `${BASE}/api/top-endings/${encodeURIComponent(lang)}?limit=${limit}`,
+    { next: { revalidate: REVALIDATE } },
+  );
+  if (!res.ok) throw new Error(`top-endings HTTP ${res.status}`);
+  return res.json();
+}

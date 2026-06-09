@@ -7,9 +7,9 @@ long tail of "Reime auf *X*" / "rhymes for *X*" queries can rank in search.
 It talks to the existing FastAPI backend (`../api.py`) over HTTP. The old Vite SPA
 in `../frontend` is kept runnable until cutover; this app supersedes it.
 
-> **Phase 1 scope.** This covers the migration with feature parity plus the
-> **word pages**. Ending pages, cross-language pages, and the full schema/sitemap
-> program are later phases (see `../CLAUDE.md` and the plan).
+> **Status.** Phase 1 (migration + **word pages**) and Phase 2 (**ending
+> pages**) are implemented. Cross-language pages (`/kreuzsprache/…`) and the
+> wider schema program are later phases (see `../CLAUDE.md` and the plan).
 
 ---
 
@@ -62,7 +62,7 @@ URL segments are **language-specific** (see `src/routes.js`):
 | `/[lang]/[section]` | `/de/reime`, `/en/rhymes` | Interactive rhyme tool (landing) |
 | `/[lang]/[section]` | `/de/reimendung`, `/en/rhyme-ending` | Interactive endings tool |
 | `/[lang]/[section]/[slug]` | `/de/reime/Armut`, `/en/rhymes/love` | **Word page** — unified SSR |
-| `/[lang]/[section]/[slug]` | `/de/reimendung/heit` | Endings detail (interactive now; full SEO page in Phase 2) |
+| `/[lang]/[section]/[slug]` | `/de/reimendung/heit` | **Ending page** — unified SSR (orthographic suffix) |
 | `/[lang]/wissenswelt[/…]` | `/de/wissenswelt/ipa` | Knowledge-base articles |
 | `/[lang]/impressum`, `/[lang]/datenschutz` | | Legal pages |
 | `/sitemap.xml`, `/robots.txt` | | Generated |
@@ -90,10 +90,17 @@ detail panel, theme, copy) hydrates on top.
 ### Static generation + ISR
 
 `[slug]/page.jsx` sets `dynamicParams = true` and `revalidate = 604800` (weekly).
-`generateStaticParams` prebuilds the top `SSG_WORD_LIMIT` words per language (from
-`GET /api/top-words/{lang}`); every other word is generated on first request and
-then cached. If the backend is down at build time, nothing is prebuilt and ISR
-fills everything in on demand.
+`generateStaticParams` prebuilds, per language, the top `SSG_WORD_LIMIT` words
+(from `GET /api/top-words/{lang}`) for the rhyme tool and the top
+`SSG_ENDING_LIMIT` endings (from `GET /api/top-endings/{lang}`) for the endings
+tool; every other word/ending is generated on first request and then cached. If
+the backend is down at build time, nothing is prebuilt and ISR fills everything
+in on demand.
+
+**Ending pages** (`/de/reimendung/heit`) work the same way as word pages but
+match an **orthographic** word-final suffix (`POST /api/endings`): server-rendered
+word list with crawlable links to each word's rhyme page, `ItemList` JSON-LD, the
+seeded interactive endings island, and per-page metadata. Empty endings 404.
 
 ---
 

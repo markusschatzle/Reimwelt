@@ -182,6 +182,8 @@ function EndungenResultsMeta({
 export default function EndungenPage({
   lang: initialLang = "de",
   initialSuffix = "",
+  initialResults = null,
+  initialMeta = null,
 }) {
   // Search state
   const [query, setQuery] = useState(initialSuffix);
@@ -190,15 +192,16 @@ export default function EndungenPage({
   const [sortMode, setSortMode] = useState("balanced");
   const [syllableCount, setSyllableCount] = useState(null);
 
-  // Results state
-  const [baseResults, setBaseResults] = useState([]);
-  const [meta, setMeta] = useState(null);
+  // Results state — seeded from server-side render on ending pages so results
+  // appear in the SSR HTML and don't refetch on hydration.
+  const [baseResults, setBaseResults] = useState(initialResults || []);
+  const [meta, setMeta] = useState(initialMeta);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [hasSearched, setHasSearched] = useState(false);
+  const [hasSearched, setHasSearched] = useState(initialResults != null);
   const [meterFilter, setMeterFilter] = useState(null);
   const [posFilter, setPosFilter] = useState(null);
-  const [lastQuery, setLastQuery] = useState("");
+  const [lastQuery, setLastQuery] = useState(initialSuffix);
 
   // Detail panel state
   const [selectedWord, setSelectedWord] = useState(null);
@@ -297,8 +300,14 @@ export default function EndungenPage({
     if (e.key === "Enter") runSearch();
   }
 
-  // Re-run when server-side filters change (only after initial search)
+  // Re-run when the language changes — but not on mount, so a server-seeded
+  // ending page doesn't refetch over its SSR results during hydration.
+  const didMountRef = useRef(false);
   useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
     if (hasSearched) runSearch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);

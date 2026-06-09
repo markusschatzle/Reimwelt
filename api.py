@@ -346,3 +346,60 @@ async def get_top_words(
         headers={"Cache-Control": "public, max-age=86400"},
     )
 
+
+# ---------------------------------------------------------------------------
+# GET /api/top-endings/{lang}
+# Most common orthographic word-final suffixes (length 3–5), ranked by how many
+# words share them. Feeds Next.js generateStaticParams + sitemap for the
+# /[lang]/reimendung/{ending} pages.
+# ---------------------------------------------------------------------------
+
+_TOP_ENDINGS_SQL = """
+WITH suffixes AS (
+    SELECT lower(right(word, n)) AS ending
+    FROM words
+    CROSS JOIN (VALUES (3), (4), (5)) AS lens(n)
+    WHERE language = %(lang)s
+      AND is_ghost_word = FALSE
+      AND is_multiword = FALSE
+      AND char_length(word) > n
+)
+SELECT ending, count(*) AS n
+FROM suffixes
+WHERE ending ~ '^[a-zäöüß]+$'
+GROUP BY ending
+HAVING count(*) >= %(min_count)s
+ORDER BY n DESC
+LIMIT %(limit)s
+"""
+
+@app.get("/api/top-endings/{lang}")
+async def get_top_endings(
+    lang: str,
+    limit: int = Query(200, ge=1, le=5000),
+    min_count: int = Query(15, ge=1),
+) -> JSONResponse:
+    try:
+        conn = _word_detail_conn()
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    try:
+        with conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    _TOP_ENDINGS_SQL,
+                    {"lang": lang, "min_count": min_count, "limit": limit},
+                )
+                rows = cur.fetchall()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"DB query failed: {exc}") from exc
+    finally:
+        conn.close()
+
+    endings = [row["ending"] for row in rows]
+    return JSONResponse(
+        content={"lang": lang, "count": len(endings), "endings": endings},
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+

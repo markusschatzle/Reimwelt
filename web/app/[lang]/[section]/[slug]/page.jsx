@@ -6,6 +6,7 @@ import {
   isLocale,
   resolveSection,
   ROUTE_SEGMENTS,
+  ENDING_SEGMENTS,
   rhymePath,
   endingPath,
 } from "../../../../src/routes.js";
@@ -14,7 +15,9 @@ import { POS_LABELS } from "../../../../src/constants.js";
 import {
   serverFetchWordDetail,
   serverSearchRhymes,
+  serverSearchEndings,
   fetchTopWords,
+  fetchTopEndings,
 } from "../../../../src/server-api.js";
 import ReimePage from "../../../../src/views/ReimePage.jsx";
 import EndungenPage from "../../../../src/views/EndungenPage.jsx";
@@ -35,6 +38,9 @@ const getRhymes = cache((word, lang) =>
     limit: 500,
   }),
 );
+const getEndings = cache((suffix, lang) =>
+  serverSearchEndings({ suffix, lang, anywhere: false, limit: 500 }),
+);
 
 function safeDecode(s) {
   try {
@@ -47,16 +53,32 @@ function safeDecode(s) {
 export async function generateStaticParams({ params }) {
   const lang = params?.lang;
   const section = params?.section;
-  // Only the rhyme tool has prebuilt detail pages in Phase 1.
-  if (!lang || ROUTE_SEGMENTS[lang] !== section) return [];
-  const limit = parseInt(process.env.SSG_WORD_LIMIT || "1000", 10);
-  try {
-    const data = await fetchTopWords(lang, limit);
-    return (data.words || []).map((w) => ({ slug: w }));
-  } catch {
-    // Backend unavailable at build time → prebuild nothing, let ISR fill in.
-    return [];
+  if (!lang) return [];
+
+  // Rhyme word pages: prebuild the top-frequency words.
+  if (ROUTE_SEGMENTS[lang] === section) {
+    const limit = parseInt(process.env.SSG_WORD_LIMIT || "1000", 10);
+    try {
+      const data = await fetchTopWords(lang, limit);
+      return (data.words || []).map((w) => ({ slug: w }));
+    } catch {
+      return [];
+    }
   }
+
+  // Ending pages: prebuild the most common orthographic suffixes.
+  if (ENDING_SEGMENTS[lang] === section) {
+    const limit = parseInt(process.env.SSG_ENDING_LIMIT || "200", 10);
+    try {
+      const data = await fetchTopEndings(lang, limit);
+      return (data.endings || []).map((e) => ({ slug: e }));
+    } catch {
+      return [];
+    }
+  }
+
+  // Backend unavailable at build time → prebuild nothing, let ISR fill in.
+  return [];
 }
 
 export async function generateMetadata({ params }) {
@@ -92,10 +114,16 @@ export async function generateMetadata({ params }) {
   // endings
   const title =
     lang === "en" ? `Words ending in “-${word}”` : `Wörter auf „-${word}“`;
+  const description =
+    lang === "en"
+      ? `A list of words ending in “-${word}”, with rhymes and pronunciation.`
+      : `Alle Wörter mit der Endung „-${word}“ – mit Reimen und Aussprache.`;
   return {
     title,
+    description,
     alternates: { canonical: endingPath(lang, word) },
     robots: { index: true, follow: true },
+    openGraph: { title, description, type: "article" },
   };
 }
 
@@ -106,16 +134,65 @@ export default async function DetailPage({ params }) {
   if (!resolved) notFound();
   const word = safeDecode(params.slug);
 
-  // --- Endings detail (interactive fallback in Phase 1; full SEO in Phase 2) ---
+  // --- Ending page: unified SSR (orthographic suffix) ---
   if (resolved.type === "endings") {
+    const data = await getEndings(word, lang);
+    const results = data.results || [];
+    if (results.length === 0) notFound(); // don't index empty endings
+
+    const ranked = deduplicateResults(sortResults(results, "balanced"));
+    const linkWords = ranked.slice(0, 60);
+    const total = data.meta?.total ?? results.length;
+    const h1 =
+      lang === "en" ? `Words ending in “-${word}”` : `Wörter auf „-${word}“`;
+
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: h1,
+      numberOfItems: linkWords.length,
+      itemListElement: linkWords.map((r, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: r.word,
+        url: rhymePath(lang, r.word),
+      })),
+    };
+
     return (
       <article className="word-page">
-        <h1 className="seo-h1">
-          {lang === "en"
-            ? `Words ending in “-${word}”`
-            : `Wörter auf „-${word}“`}
-        </h1>
-        <EndungenPage key={word} lang={lang} initialSuffix={word} />
+        <header className="seo-head">
+          <h1 className="seo-h1">{h1}</h1>
+        </header>
+
+        <EndungenPage
+          key={word}
+          lang={lang}
+          initialSuffix={word}
+          initialResults={results}
+          initialMeta={data.meta}
+        />
+
+        <section className="seo-prose" aria-label={h1}>
+          <p className="seo-meta">
+            {lang === "en" ? `${total} words` : `${total} Wörter`}
+          </p>
+          <nav className="seo-block" aria-label={h1}>
+            <h2>{h1}</h2>
+            <ul className="seo-link-list">
+              {linkWords.map((r) => (
+                <li key={`${r.word}-${r.language}`}>
+                  <Link href={rhymePath(lang, r.word)}>{r.word}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </section>
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </article>
     );
   }
