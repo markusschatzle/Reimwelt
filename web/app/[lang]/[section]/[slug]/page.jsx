@@ -4,12 +4,15 @@ import Link from "next/link";
 
 import {
   isLocale,
+  isSafeSlug,
   resolveSection,
   ROUTE_SEGMENTS,
   ENDING_SEGMENTS,
   rhymePath,
   endingPath,
+  crossPath,
 } from "../../../../src/routes.js";
+import { crossShortLabel } from "../../../../src/cross.js";
 import { sortResults, deduplicateResults } from "../../../../src/utils.js";
 import { POS_LABELS } from "../../../../src/constants.js";
 import {
@@ -60,7 +63,7 @@ export async function generateStaticParams({ params }) {
     const limit = parseInt(process.env.SSG_WORD_LIMIT || "1000", 10);
     try {
       const data = await fetchTopWords(lang, limit);
-      return (data.words || []).map((w) => ({ slug: w }));
+      return (data.words || []).filter(isSafeSlug).map((w) => ({ slug: w }));
     } catch {
       return [];
     }
@@ -71,7 +74,7 @@ export async function generateStaticParams({ params }) {
     const limit = parseInt(process.env.SSG_ENDING_LIMIT || "200", 10);
     try {
       const data = await fetchTopEndings(lang, limit);
-      return (data.endings || []).map((e) => ({ slug: e }));
+      return (data.endings || []).filter(isSafeSlug).map((e) => ({ slug: e }));
     } catch {
       return [];
     }
@@ -216,6 +219,7 @@ export default async function DetailPage({ params }) {
 
   const h1 = lang === "en" ? `Rhymes for “${word}”` : `Reime auf „${word}“`;
   const posLabel = detail.pos ? POS_LABELS[detail.pos] || detail.pos : null;
+  const otherLang = lang === "de" ? "en" : "de"; // for the cross-language link
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -297,6 +301,12 @@ export default async function DetailPage({ params }) {
             </ul>
           </nav>
         )}
+
+        <p className="seo-meta">
+          <Link href={crossPath(lang, otherLang, word)}>
+            {crossShortLabel(lang, otherLang, word)}
+          </Link>
+        </p>
       </section>
 
       <script

@@ -1,9 +1,12 @@
 import {
   LOCALES,
+  LANG_PAIRS,
   ROUTE_SEGMENTS,
   ENDING_SEGMENTS,
   rhymePath,
   endingPath,
+  crossPath,
+  isSafeSlug,
 } from "../src/routes.js";
 import { fetchTopWords, fetchTopEndings } from "../src/server-api.js";
 
@@ -49,7 +52,7 @@ export default async function sitemap() {
     );
     try {
       const data = await fetchTopWords(lang, wordLimit);
-      for (const w of data.words || []) {
+      for (const w of (data.words || []).filter(isSafeSlug)) {
         entries.push({
           url: `${SITE}${rhymePath(lang, w)}`,
           changeFrequency: "weekly",
@@ -66,7 +69,7 @@ export default async function sitemap() {
     );
     try {
       const data = await fetchTopEndings(lang, endingLimit);
-      for (const e of data.endings || []) {
+      for (const e of (data.endings || []).filter(isSafeSlug)) {
         entries.push({
           url: `${SITE}${endingPath(lang, e)}`,
           changeFrequency: "weekly",
@@ -75,6 +78,31 @@ export default async function sitemap() {
       }
     } catch {
       // Backend unavailable — skip ending URLs.
+    }
+  }
+
+  // Cross-language pages: landing + top source-language words per pair.
+  const crossLimit = parseInt(
+    process.env.SITEMAP_CROSS_LIMIT || process.env.SSG_CROSS_LIMIT || "300",
+    10,
+  );
+  for (const [src, tgt] of LANG_PAIRS) {
+    entries.push({
+      url: `${SITE}${crossPath(src, tgt)}`,
+      changeFrequency: "weekly",
+      priority: 0.5,
+    });
+    try {
+      const data = await fetchTopWords(src, crossLimit);
+      for (const w of (data.words || []).filter(isSafeSlug)) {
+        entries.push({
+          url: `${SITE}${crossPath(src, tgt, w)}`,
+          changeFrequency: "weekly",
+          priority: 0.4,
+        });
+      }
+    } catch {
+      // Backend unavailable — landing only.
     }
   }
 

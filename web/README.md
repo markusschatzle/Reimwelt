@@ -7,9 +7,9 @@ long tail of "Reime auf *X*" / "rhymes for *X*" queries can rank in search.
 It talks to the existing FastAPI backend (`../api.py`) over HTTP. The old Vite SPA
 in `../frontend` is kept runnable until cutover; this app supersedes it.
 
-> **Status.** Phase 1 (migration + **word pages**) and Phase 2 (**ending
-> pages**) are implemented. Cross-language pages (`/kreuzsprache/…`) and the
-> wider schema program are later phases (see `../CLAUDE.md` and the plan).
+> **Status.** Phase 1 (migration + **word pages**), Phase 2 (**ending pages**)
+> and Phase 3 (**cross-language pages**) are implemented. The wider schema /
+> internal-linking program is a later phase (see `../CLAUDE.md` and the plan).
 
 ---
 
@@ -63,9 +63,16 @@ URL segments are **language-specific** (see `src/routes.js`):
 | `/[lang]/[section]` | `/de/reimendung`, `/en/rhyme-ending` | Interactive endings tool |
 | `/[lang]/[section]/[slug]` | `/de/reime/Armut`, `/en/rhymes/love` | **Word page** — unified SSR |
 | `/[lang]/[section]/[slug]` | `/de/reimendung/heit` | **Ending page** — unified SSR (orthographic suffix) |
+| `/kreuzsprache/[langpair]` | `/kreuzsprache/de-en` | Cross-language tool (landing) |
+| `/kreuzsprache/[langpair]/[slug]` | `/kreuzsprache/de-en/Armut` | **Cross-language page** — target-language rhymes for a source word |
 | `/[lang]/wissenswelt[/…]` | `/de/wissenswelt/ipa` | Knowledge-base articles |
 | `/[lang]/impressum`, `/[lang]/datenschutz` | | Legal pages |
 | `/sitemap.xml`, `/robots.txt` | | Generated |
+
+The `kreuzsprache` section is **not** locale-prefixed; the `[langpair]`
+(`de-en`, `en-de`) encodes source→target. The page is written in the source
+language's voice and reuses `/api/rhymes` with `source_lang`/`target_langs` (no
+new backend endpoint); `generateStaticParams`/sitemap use top source words.
 
 `[section]` is a dynamic segment validated by `resolveSection(lang, section)`;
 unknown sections / languages → `notFound()`.

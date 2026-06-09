@@ -61,16 +61,20 @@ function ErrorBanner({ message }) {
 
 export default function ReimePage({
   lang = "de",
+  sourceLang: sourceLangProp,
+  targetLang: targetLangProp,
+  langLocked: langLockedProp,
   initialWord = "",
   initialResults = null,
   initialQueryMeta = null,
   initialMeta = null,
 }) {
-  // Search state
+  // Search state. sourceLang/targetLang default to `lang` (same-language search);
+  // the cross-language pages pass distinct source/target with the lock off.
   const [query, setQuery] = useState(initialWord);
-  const [sourceLang, setSourceLang] = useState(lang);
-  const [targetLang, setTargetLang] = useState(lang);
-  const [langLocked, setLangLocked] = useState(true);
+  const [sourceLang, setSourceLang] = useState(sourceLangProp ?? lang);
+  const [targetLang, setTargetLang] = useState(targetLangProp ?? lang);
+  const [langLocked, setLangLocked] = useState(langLockedProp ?? true);
   const [sortMode, setSortMode] = useState("balanced");
   const [syllableCount, setSyllableCount] = useState(null);
 
