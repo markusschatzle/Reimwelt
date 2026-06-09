@@ -64,12 +64,16 @@ export async function generateMetadata({ params }) {
   const title = crossTitle(pair.src, pair.tgt, word);
   const detail = await getDetail(word, pair.src).catch(() => null);
   if (!detail) return { title, robots: { index: false, follow: true } };
+  // No cross-language rhymes → still render the page (graceful empty state),
+  // but keep it out of the index.
+  const data = await getCross(word, pair.src, pair.tgt).catch(() => null);
+  const hasResults = (data?.results || []).some((r) => r.language === pair.tgt);
   const description = crossDescription(pair.src, pair.tgt, word);
   return {
     title,
     description,
     alternates: { canonical: crossPath(pair.src, pair.tgt, word) },
-    robots: { index: true, follow: true },
+    robots: { index: hasResults, follow: true },
     openGraph: { title, description, type: "article" },
   };
 }
@@ -85,7 +89,9 @@ export default async function CrossWordPage({ params }) {
   const data = await getCross(word, pair.src, pair.tgt);
   // Keep only target-language rhymes (drops the source word if echoed back).
   const results = (data.results || []).filter((r) => r.language === pair.tgt);
-  if (results.length === 0) notFound();
+  // No notFound() on empty — the search island below renders the normal
+  // "Keine Reime gefunden" empty state (the page is noindex'd via metadata).
+  const hasResults = results.length > 0;
 
   const ranked = deduplicateResults(sortResults(results, "balanced"));
   const linkWords = ranked.slice(0, 40);
@@ -113,7 +119,9 @@ export default async function CrossWordPage({ params }) {
     },
     { name: word, href: crossPath(pair.src, pair.tgt, word) },
   ];
-  const jsonLd = [itemList, breadcrumbList(crumbs)];
+  const jsonLd = hasResults
+    ? [itemList, breadcrumbList(crumbs)]
+    : [breadcrumbList(crumbs)];
 
   return (
     <article className="word-page">
