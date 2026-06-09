@@ -84,10 +84,9 @@ body {
   color: var(--text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
-}
-
-#root {
+  /* Sticky-footer column: <main> grows to fill so the footer sits at the
+     bottom on short pages instead of leaving a gap below it. (In the old Vite
+     app this lived on #root, which no longer exists under Next.) */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
