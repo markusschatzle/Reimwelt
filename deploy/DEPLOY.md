@@ -92,11 +92,22 @@ Visit `https://reimwelt.de` — it redirects to `/de/reime`.
 
 ## 6. Redeploying
 
+One command — pull, update deps, rebuild the frontend, restart both services,
+and health-check them:
+
+```bash
+cd /opt/reimwelt && ./deploy/redeploy.sh
+#   ./deploy/redeploy.sh --clean     # also wipe .next (see the ISR note below)
+#   ./deploy/redeploy.sh --no-pull   # deploy the current checkout, skip git pull
+```
+
+It uses `sudo systemctl restart`, so run it as a user allowed to restart the
+units (or with sudo). Equivalent manual steps:
+
 ```bash
 cd /opt/reimwelt && git pull
 .venv/bin/pip install -r requirements.txt        # if backend deps changed
 sudo systemctl restart reimwelt-api
-
 cd web && npm ci && npm run build
 sudo systemctl restart reimwelt-web
 ```
