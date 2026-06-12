@@ -31,6 +31,7 @@ export default function SearchBar({
           onKeyDown={onKeyDown}
           autoComplete="off"
           spellCheck="false"
+          autoFocus
         />
         {currentIpa && (
           <span className="search-ipa-display">[{currentIpa}]</span>
