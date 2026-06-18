@@ -48,6 +48,11 @@ export default function RootLayout({ children }) {
           gtag('config', 'G-TLZWWNL4M7');
         `}
       </Script>
+      <Script
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5557701409459816"
+        strategy="afterInteractive"
+        crossOrigin="anonymous"
+      />
       <body>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
