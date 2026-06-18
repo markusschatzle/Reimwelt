@@ -90,21 +90,12 @@ export default function DatenschutzPage() {
         übertragen und nicht dauerhaft gespeichert.
       </p>
 
-      <h2>Externe Schriftarten</h2>
+      <h2>Schriftarten</h2>
       <p>
-        Diese Website lädt Schriftarten von Google Fonts. Dabei wird Ihre
-        IP-Adresse an Server von Google LLC übertragen. Rechtsgrundlage ist
-        unser berechtigtes Interesse an einer einheitlichen Darstellung der
-        Website (Art. 6 Abs. 1 lit. f DSGVO). Weitere Informationen finden Sie
-        in der{" "}
-        <a
-          href="https://policies.google.com/privacy"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Datenschutzerklärung von Google
-        </a>
-        .
+        Diese Website verwendet Web­schriftarten (Fraunces, DM Sans, Lora,
+        JetBrains Mono), die auf unserem eigenen Server bereitgestellt werden.
+        Es findet keine Verbindung zu Servern von Google oder anderen Dritten
+        statt; Ihre IP-Adresse wird zu diesem Zweck nicht übertragen.
       </p>
 
       <h2>Ihre Rechte</h2>
@@ -138,7 +129,7 @@ export default function DatenschutzPage() {
         abrufbar.
       </p>
 
-      <p>Stand: Mai 2026</p>
+      <p>Stand: Juni 2026</p>
     </div>
   );
 }
