@@ -37,24 +37,14 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
         {/*
-          Preload the two critical fonts. Without preload, the browser only
-          discovers fonts after parsing the full CSS — on slow mobile this
-          delays FCP and LCP by 1-3 seconds.
+          Preload the fonts that PageSpeed identifies in the critical chain.
+          Without preload, these are only discovered after the full CSS parses —
+          on slow mobile that costs 600-700ms per font.
         */}
-        <link
-          rel="preload"
-          as="font"
-          type="font/woff2"
-          href="/fonts/dmsans-normal-latin.woff2"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          as="font"
-          type="font/woff2"
-          href="/fonts/fraunces-normal-latin.woff2"
-          crossOrigin="anonymous"
-        />
+        <link rel="preload" as="font" type="font/woff2" href="/fonts/dmsans-normal-latin.woff2" crossOrigin="anonymous" />
+        <link rel="preload" as="font" type="font/woff2" href="/fonts/fraunces-normal-latin.woff2" crossOrigin="anonymous" />
+        <link rel="preload" as="font" type="font/woff2" href="/fonts/fraunces-italic-400-latin.woff2" crossOrigin="anonymous" />
+        <link rel="preload" as="font" type="font/woff2" href="/fonts/jetbrainsmono-normal-400-latin.woff2" crossOrigin="anonymous" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {/*
           Consent Mode v2 — set ALL storage to "denied" synchronously before
@@ -77,9 +67,11 @@ gtag('set', 'ads_data_redaction', true);
 gtag('set', 'url_passthrough', true);
         `.trim() }} />
         {/* AdSense — must be in <head> for crawler detection.
-            Respects the Consent Mode v2 default-denied state set above. */}
+            fetchPriority="low" tells the browser to deprioritize this 222KB
+            script behind fonts and CSS on constrained mobile connections. */}
         <script
           async
+          fetchPriority="low"
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5557701409459816"
           crossOrigin="anonymous"
         />

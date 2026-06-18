@@ -16,5 +16,11 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.3"
-  }
+  },
+  "browserslist": [
+    "chrome >= 109",
+    "firefox >= 110",
+    "safari >= 16",
+    "edge >= 109"
+  ]
 }
