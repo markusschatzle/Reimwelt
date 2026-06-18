@@ -35,6 +35,12 @@ export default function RootLayout({ children }) {
     <html lang="de" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        {/* AdSense — must be in <head> for crawler detection */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5557701409459816"
+          crossOrigin="anonymous"
+        />
       </head>
       <Script
         src="https://www.googletagmanager.com/gtag/js?id=G-TLZWWNL4M7"
@@ -48,11 +54,6 @@ export default function RootLayout({ children }) {
           gtag('config', 'G-TLZWWNL4M7');
         `}
       </Script>
-      <Script
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5557701409459816"
-        strategy="afterInteractive"
-        crossOrigin="anonymous"
-      />
       <body>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
