@@ -1,6 +1,7 @@
 import "../src/styles.css";
 import { ThemeProvider } from "../src/ThemeContext.jsx";
 import { OG_IMAGE } from "../src/seo.js";
+import Script from "next/script";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reimwelt.de";
 
@@ -35,6 +36,18 @@ export default function RootLayout({ children }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-TLZWWNL4M7"
+        strategy="afterInteractive"
+      />
+      <Script id="gtag-init" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-TLZWWNL4M7');
+        `}
+      </Script>
       <body>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
