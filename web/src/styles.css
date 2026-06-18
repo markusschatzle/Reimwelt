@@ -1977,7 +1977,12 @@ body {
 
 .cookie-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cookie-actions-main {
+  display: flex;
   gap: 8px;
 }
 
@@ -2009,19 +2014,18 @@ body {
   outline-offset: 2px;
 }
 
-.cookie-btn--primary {
-  flex-basis: 100%;
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-  box-shadow: var(--shadow-btn);
+.cookie-btn--secondary {
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: var(--text-tertiary, var(--text-secondary));
+  border-color: transparent;
+  background: transparent;
 }
 
-.cookie-btn--primary:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
-  color: #fff;
-  box-shadow: var(--shadow-btn-hover);
+.cookie-btn--secondary:hover {
+  background: var(--surface-subtle);
+  border-color: var(--border-subtle, var(--border-medium));
+  color: var(--text-secondary);
 }
 
 @media (max-width: 480px) {

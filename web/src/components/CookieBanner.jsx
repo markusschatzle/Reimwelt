@@ -152,33 +152,35 @@ export default function CookieBanner() {
       )}
 
       <div className="cookie-actions">
-        <button
-          type="button"
-          className="cookie-btn"
-          onClick={handleRejectAll}
-        >
-          Alle ablehnen
-        </button>
+        <div className="cookie-actions-main">
+          <button
+            type="button"
+            className="cookie-btn"
+            onClick={handleRejectAll}
+          >
+            Alle ablehnen
+          </button>
+          <button
+            type="button"
+            className="cookie-btn"
+            onClick={handleAcceptAll}
+          >
+            Alle akzeptieren
+          </button>
+        </div>
         {showSettings ? (
-          <button type="button" className="cookie-btn" onClick={handleSave}>
+          <button type="button" className="cookie-btn cookie-btn--secondary" onClick={handleSave}>
             Auswahl speichern
           </button>
         ) : (
           <button
             type="button"
-            className="cookie-btn"
+            className="cookie-btn cookie-btn--secondary"
             onClick={() => setShowSettings(true)}
           >
             Einstellungen
           </button>
         )}
-        <button
-          type="button"
-          className="cookie-btn cookie-btn--primary"
-          onClick={handleAcceptAll}
-        >
-          Alle akzeptieren
-        </button>
       </div>
     </div>
   );
