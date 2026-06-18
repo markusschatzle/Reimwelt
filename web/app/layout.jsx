@@ -1,7 +1,6 @@
 import "../src/styles.css";
 import { ThemeProvider } from "../src/ThemeContext.jsx";
 import { OG_IMAGE } from "../src/seo.js";
-import Script from "next/script";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reimwelt.de";
 
@@ -35,25 +34,36 @@ export default function RootLayout({ children }) {
     <html lang="de" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        {/* AdSense — must be in <head> for crawler detection */}
+        {/*
+          Consent Mode v2 — set ALL storage to "denied" synchronously before
+          any ad script loads. AppShell calls initConsent() which will later
+          update this based on the user's stored choice or show the banner.
+        */}
+        <script dangerouslySetInnerHTML={{ __html: `
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('consent', 'default', {
+  ad_storage: 'denied',
+  ad_user_data: 'denied',
+  ad_personalization: 'denied',
+  analytics_storage: 'denied',
+  functionality_storage: 'granted',
+  security_storage: 'granted',
+  wait_for_update: 500
+});
+gtag('set', 'ads_data_redaction', true);
+gtag('set', 'url_passthrough', true);
+        `.trim() }} />
+        {/* AdSense — must be in <head> for crawler detection.
+            Respects the Consent Mode v2 default-denied state set above. */}
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5557701409459816"
           crossOrigin="anonymous"
         />
       </head>
-      <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-TLZWWNL4M7"
-        strategy="afterInteractive"
-      />
-      <Script id="gtag-init" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-TLZWWNL4M7');
-        `}
-      </Script>
+      {/* GA4 is loaded by consent.js (via NEXT_PUBLIC_GA_ID) after the user
+          accepts cookies — do NOT add hardcoded gtag scripts here. */}
       <body>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
