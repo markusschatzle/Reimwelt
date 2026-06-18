@@ -33,6 +33,28 @@ export default function RootLayout({ children }) {
   return (
     <html lang="de" suppressHydrationWarning>
       <head>
+        {/* Preconnect to AdSense CDN so the connection is ready when the script loads */}
+        <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
+        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+        {/*
+          Preload the two critical fonts. Without preload, the browser only
+          discovers fonts after parsing the full CSS — on slow mobile this
+          delays FCP and LCP by 1-3 seconds.
+        */}
+        <link
+          rel="preload"
+          as="font"
+          type="font/woff2"
+          href="/fonts/dmsans-normal-latin.woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          as="font"
+          type="font/woff2"
+          href="/fonts/fraunces-normal-latin.woff2"
+          crossOrigin="anonymous"
+        />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {/*
           Consent Mode v2 — set ALL storage to "denied" synchronously before
