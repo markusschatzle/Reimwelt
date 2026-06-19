@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 
 import {
@@ -221,7 +221,12 @@ export default async function DetailPage({ params }) {
 
   // --- Rhyme word page: unified SSR ---
   const detail = await getDetail(word, lang);
-  if (!detail) notFound();
+  // Word not in DB — redirect to the search page with the word pre-filled
+  // rather than showing a hard 404 (e.g. synonym links for unindexed words).
+  if (!detail) {
+    const searchBase = `/${lang}/${ROUTE_SEGMENTS[lang]}`;
+    redirect(`${searchBase}?q=${encodeURIComponent(word)}`);
+  }
 
   const rhymeData = await getRhymes(word, lang);
   const results = rhymeData.results || [];
