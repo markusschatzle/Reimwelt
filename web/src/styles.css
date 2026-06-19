@@ -1245,9 +1245,7 @@ body {
 
 @media (max-width: 600px) {
   .results-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 16px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

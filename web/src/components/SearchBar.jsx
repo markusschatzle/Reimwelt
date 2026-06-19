@@ -10,12 +10,15 @@ export default function SearchBar({
   currentIpa,
   placeholder = "Wort eingeben …",
   buttonLabel = "Reime finden",
+  autoFocus = false,
 }) {
   return (
     <form
       className="search-bar-row"
       onSubmit={(e) => {
         e.preventDefault();
+        // Dismiss mobile keyboard after submit
+        e.currentTarget.querySelector("input")?.blur();
         onSearch();
       }}
     >
@@ -31,7 +34,7 @@ export default function SearchBar({
           onKeyDown={onKeyDown}
           autoComplete="off"
           spellCheck="false"
-          autoFocus
+          autoFocus={autoFocus}
         />
         {currentIpa && (
           <span className="search-ipa-display">[{currentIpa}]</span>

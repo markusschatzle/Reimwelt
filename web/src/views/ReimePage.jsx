@@ -270,6 +270,7 @@ export default function ReimePage({
           onKeyDown={handleKeyDown}
           onSearch={() => runSearch()}
           currentIpa={queryMeta?.ipa}
+          autoFocus={!initialWord}
         />
 
         {/* Language row */}
