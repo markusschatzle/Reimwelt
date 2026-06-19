@@ -635,39 +635,11 @@ def _minimal_suffix(rhyme_part: str) -> str:
     return rhyme_part  # fallback: use the whole rhyme_part
 
 
-_CANDIDATE_SQL = """
-SELECT
-    word, language, ipa, rhyme_part, frequency_score,
-    syllable_count, meter, stress_pattern, pos,
-    definitions, audio_url, is_abbreviation
-FROM words
-WHERE
-  CASE
-    -- Same language: strip the non-syllabic diacritic ̯ (U+032F) on both sides
-    -- so stored 'aɪ̯ɐ' matches a normalised search suffix of 'aɪɐ', but ɐ
-    -- is NOT collapsed to ə — keeping same-language rhymes strict.
-    WHEN language = %(source_lang)s
-      THEN replace(replace(replace(replace(replace(
-               translate(rhyme_part, E'\\u032F', ''),
-               'n' || chr(809), chr(601) || 'n'),
-               'l' || chr(809), chr(601) || 'l'),
-               'm' || chr(809), chr(601) || 'm'),
-               'r' || chr(809), chr(601) || 'r'),
-               chr(331) || chr(809), chr(601) || chr(331))
-             LIKE '%%' || translate(%(rhyme_suffix)s::text, E'\\u032F', '')
-    -- Cross-language: additionally collapse ɐ→ə so that e.g. DE 'aɪ̯ɐ'
-    -- matches EN 'aɪə' (fire / Eier).
-    ELSE
-      replace(replace(replace(replace(replace(
-          translate(rhyme_part, E'\\u0250\\u032F', E'\\u0259'),
-          'n' || chr(809), chr(601) || 'n'),
-          'l' || chr(809), chr(601) || 'l'),
-          'm' || chr(809), chr(601) || 'm'),
-          'r' || chr(809), chr(601) || 'r'),
-          chr(331) || chr(809), chr(601) || chr(331))
-        LIKE '%%' || translate(%(rhyme_suffix)s::text, E'\\u0250\\u032F', E'\\u0259')
-  END
-  AND language = ANY(%(target_langs)s)
+# Split into two queries so the planner can match each WHERE expression
+# directly against the corresponding functional GIN index, instead of hiding
+# it inside a CASE branch (which prevents index use).
+
+_COMMON_FILTERS = """
   AND word NOT LIKE '%% %%'
   AND word NOT LIKE '%%*%%'
   AND (%(include_multiword)s OR is_multiword = FALSE)
@@ -679,6 +651,46 @@ WHERE
   AND LOWER(word) != LOWER(%(search_word)s)
 ORDER BY frequency_score DESC
 """
+
+# Same-language: strip ̯ (U+032F) and normalise syllabic consonants.
+# Matches functional index words_rhyme_norm_{lang}_trgm.
+_SAME_LANG_SQL = """
+SELECT
+    word, language, ipa, rhyme_part, frequency_score,
+    syllable_count, meter, stress_pattern, pos,
+    definitions, audio_url, is_abbreviation
+FROM words
+WHERE
+  replace(replace(replace(replace(replace(
+      translate(rhyme_part, E'\\u032F', ''),
+      'n' || chr(809), chr(601) || 'n'),
+      'l' || chr(809), chr(601) || 'l'),
+      'm' || chr(809), chr(601) || 'm'),
+      'r' || chr(809), chr(601) || 'r'),
+      chr(331) || chr(809), chr(601) || chr(331))
+    LIKE '%%' || %(same_suffix)s
+  AND language = %(source_lang)s
+""" + _COMMON_FILTERS
+
+# Cross-language: additionally collapse ɐ→ə so DE 'aɪ̯ɐ' matches EN 'aɪə'.
+# Matches functional index words_rhyme_cross_trgm.
+_CROSS_LANG_SQL = """
+SELECT
+    word, language, ipa, rhyme_part, frequency_score,
+    syllable_count, meter, stress_pattern, pos,
+    definitions, audio_url, is_abbreviation
+FROM words
+WHERE
+  replace(replace(replace(replace(replace(
+      translate(rhyme_part, E'\\u0250\\u032F', E'\\u0259'),
+      'n' || chr(809), chr(601) || 'n'),
+      'l' || chr(809), chr(601) || 'l'),
+      'm' || chr(809), chr(601) || 'm'),
+      'r' || chr(809), chr(601) || 'r'),
+      chr(331) || chr(809), chr(601) || chr(331))
+    LIKE '%%' || %(cross_suffix)s
+  AND language = ANY(%(cross_langs)s)
+""" + _COMMON_FILTERS
 
 
 def _fetch_candidates(
@@ -695,15 +707,21 @@ def _fetch_candidates(
     min_frequency: float,
 ) -> list[dict[str, Any]]:
     """
-    Execute the candidate-fetch query and return a list of row dicts.
+    Execute candidate-fetch queries and return a combined list of row dicts.
 
-    All parameters are bound via psycopg2 parameterisation — no SQL string
-    interpolation is performed.
+    Runs separate queries for same-language and cross-language targets so each
+    uses the appropriate functional GIN index (no CASE branch hiding the
+    predicate from the planner).
     """
-    params = {
-        "rhyme_suffix":     rhyme_suffix,
-        "source_lang":      source_lang,
-        "target_langs":     target_langs,
+    from phonetics import normalize_rhyme_ipa  # local import avoids circularity
+
+    same_suffix = rhyme_suffix.translate(str.maketrans("̯", ""))
+    cross_suffix = rhyme_suffix.translate(str.maketrans("ɐ̯", "əə"))
+
+    same_langs  = [l for l in target_langs if l == source_lang]
+    cross_langs = [l for l in target_langs if l != source_lang]
+
+    common = {
         "include_multiword": include_multiword,
         "meter":            meter,
         "stress_pattern":   stress_pattern,
@@ -711,9 +729,27 @@ def _fetch_candidates(
         "min_frequency":    min_frequency,
         "search_word":      search_word,
     }
+
+    rows: list[dict] = []
     with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-        cur.execute(_CANDIDATE_SQL, params)
-        return [dict(row) for row in cur.fetchall()]
+        if same_langs:
+            cur.execute(_SAME_LANG_SQL, {
+                **common,
+                "same_suffix": same_suffix,
+                "source_lang": source_lang,
+            })
+            rows.extend(dict(r) for r in cur.fetchall())
+
+        if cross_langs:
+            cur.execute(_CROSS_LANG_SQL, {
+                **common,
+                "cross_suffix": cross_suffix,
+                "cross_langs":  cross_langs,
+                "source_lang":  source_lang,  # unused in SQL but keeps params consistent
+            })
+            rows.extend(dict(r) for r in cur.fetchall())
+
+    return rows
 
 # ---------------------------------------------------------------------------
 # eSpeak fallback for live words
