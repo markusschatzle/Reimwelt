@@ -713,10 +713,10 @@ def _fetch_candidates(
     uses the appropriate functional GIN index (no CASE branch hiding the
     predicate from the planner).
     """
-    from phonetics import normalize_rhyme_ipa  # local import avoids circularity
-
-    same_suffix = rhyme_suffix.translate(str.maketrans("̯", ""))
-    cross_suffix = rhyme_suffix.translate(str.maketrans("ɐ̯", "əə"))
+    # Mirror the SQL translate() calls in Python to build the LIKE suffixes.
+    # Same-language: delete ̯ (U+032F). Cross-language: also collapse ɐ→ə.
+    same_suffix = rhyme_suffix.translate({ord("̯"): None})
+    cross_suffix = rhyme_suffix.translate({ord("ɐ"): "ə", ord("̯"): None})
 
     same_langs  = [l for l in target_langs if l == source_lang]
     cross_langs = [l for l in target_langs if l != source_lang]
