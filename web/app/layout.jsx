@@ -66,12 +66,9 @@ gtag('consent', 'default', {
 gtag('set', 'ads_data_redaction', true);
 gtag('set', 'url_passthrough', true);
         `.trim() }} />
-        {/* AdSense — must be in <head> for crawler detection.
-            fetchPriority="low" tells the browser to deprioritize this 222KB
-            script behind fonts and CSS on constrained mobile connections. */}
+        {/* AdSense — must be in <head> for crawler detection. */}
         <script
           async
-          fetchPriority="low"
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5557701409459816"
           crossOrigin="anonymous"
         />
