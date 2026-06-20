@@ -13,8 +13,7 @@ export const metadata = {
   description:
     "Reimwelt findet phonetisch passende Reime auf deutsche und englische Wörter – mit Lautschrift, Metrum und Worthäufigkeit.",
   icons: [
-    { rel: "icon", url: "/icons/Logo.svg", type: "image/svg+xml" },
-    { rel: "icon", url: "/icons/Logo.ico", sizes: "any" }, // fallback for Google Search
+    { rel: "icon", url: "/icons/Logo.png", type: "image/png" },
   ],
   // Default social-share metadata; pages that set their own openGraph re-include
   // OG_IMAGE so the preview image is present everywhere.
