@@ -66,7 +66,8 @@ gtag('consent', 'default', {
 gtag('set', 'ads_data_redaction', true);
 gtag('set', 'url_passthrough', true);
         `.trim() }} />
-        {/* AdSense — must be in <head> for crawler detection. */}
+        {/* AdSense — meta tag for ownership verification + script for auto ads */}
+        <meta name="google-adsense-account" content="ca-pub-5557701409459816" />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5557701409459816"
