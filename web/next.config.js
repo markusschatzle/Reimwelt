@@ -25,6 +25,15 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/de/reime",
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {
