@@ -5,13 +5,13 @@ export async function generateMetadata({ params }) {
   return {
     title: "Homographe: gleich geschrieben, verschieden ausgesprochen",
     description:
-      "Was sind Homographe? Wörter wie „modern" oder „Tenor" klingen je nach Bedeutung völlig anders. Mit Beispielen, IPA-Aussprache und Auswirkung auf die Reimsuche.",
+      "Was sind Homographe? Wörter wie 'modern' oder 'Tenor' klingen je nach Bedeutung völlig anders. Mit Beispielen, IPA-Aussprache und Auswirkung auf die Reimsuche.",
     alternates: { canonical: `/${lang}/wissenswelt/homographe` },
     robots: { index: true, follow: true },
     openGraph: {
       title: "Homographe: gleich geschrieben, verschieden ausgesprochen",
       description:
-        "Wörter wie „modern" oder „Tenor" – gleiche Schreibung, verschiedene Aussprache und Bedeutung.",
+        "Wörter wie 'modern' oder 'Tenor' – gleiche Schreibung, verschiedene Aussprache und Bedeutung.",
       type: "article",
     },
   };
