@@ -32,17 +32,20 @@ export default async function sitemap() {
       url: `${SITE}/${lang}/${ROUTE_SEGMENTS[lang]}`,
       changeFrequency: "weekly",
       priority: 1.0,
+      lastModified: new Date(),
     });
     entries.push({
       url: `${SITE}/${lang}/${ENDING_SEGMENTS[lang]}`,
       changeFrequency: "weekly",
       priority: 0.7,
+      lastModified: new Date(),
     });
     for (const p of STATIC_PATHS) {
       entries.push({
         url: `${SITE}/${lang}/${p}`,
         changeFrequency: "monthly",
         priority: 0.4,
+        lastModified: new Date(),
       });
     }
 
@@ -57,6 +60,7 @@ export default async function sitemap() {
           url: `${SITE}${rhymePath(lang, w)}`,
           changeFrequency: "weekly",
           priority: 0.6,
+          lastModified: new Date(),
         });
       }
     } catch {
@@ -74,6 +78,7 @@ export default async function sitemap() {
           url: `${SITE}${endingPath(lang, e)}`,
           changeFrequency: "weekly",
           priority: 0.5,
+          lastModified: new Date(),
         });
       }
     } catch {
