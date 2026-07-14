@@ -21,7 +21,7 @@ export default function Footer() {
             type="button"
             className="footer-link footer-link--button"
             onClick={() =>
-              window.dispatchEvent(new Event("open-cookie-settings"))
+              window.googlefc?.showRevocationMessage?.()
             }
           >
             Cookie-Einstellungen

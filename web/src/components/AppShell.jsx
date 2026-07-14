@@ -3,8 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
-import CookieBanner from "./CookieBanner.jsx";
-import { initConsent } from "../consent.js";
 
 // Client shell: Header, the spotlight-tracking <main>, Footer, copy toast and
 // cookie banner. Ported from the old App.jsx (minus React Router). Rendered
@@ -15,10 +13,8 @@ export default function AppShell({ children }) {
   const [toastVisible, setToastVisible] = useState(false);
   const toastTimerRef = useRef(null);
 
-  // Consent Mode v2 defaults + gtag.js (no-op until GA/Ads IDs are set).
-  useEffect(() => {
-    initConsent();
-  }, []);
+  // Consent Mode v2 is initialised in layout.jsx (synchronous inline script)
+  // and managed by Google's CMP. No custom consent init needed here.
 
   // "Copied" toast, triggered by WordChip via a window event.
   useEffect(() => {
@@ -98,7 +94,6 @@ export default function AppShell({ children }) {
       >
         ✓ Kopiert
       </div>
-      <CookieBanner />
     </>
   );
 }

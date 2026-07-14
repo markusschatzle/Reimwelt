@@ -7,11 +7,11 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reimwelt.de";
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Reimwelt – phonetische Reimsuche",
+    default: "Reimwelt – Reimmaschine & Reimlexikon online",
     template: "%s · Reimwelt",
   },
   description:
-    "Reimwelt findet phonetisch passende Reime auf deutsche und englische Wörter – mit Lautschrift, Metrum und Worthäufigkeit.",
+    "Reimwelt ist deine kostenlose Reimmaschine und dein Reimlexikon: phonetisch passende Reime auf deutsche und englische Wörter – mit Lautschrift, Metrum und Häufigkeit.",
   icons: [
     { rel: "icon", url: "/icons/Logo.png", type: "image/png" },
   ],
@@ -75,10 +75,35 @@ gtag('set', 'url_passthrough', true);
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5557701409459816"
           crossOrigin="anonymous"
         />
+        {/* GA4 — loaded statically so Google's CMP can control it via Consent
+            Mode v2 signals. No data is sent until analytics_storage is granted. */}
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} />
+            <script dangerouslySetInnerHTML={{ __html: `gtag('js',new Date());gtag('config','${process.env.NEXT_PUBLIC_GA_ID}');` }} />
+          </>
+        )}
       </head>
-      {/* GA4 is loaded by consent.js (via NEXT_PUBLIC_GA_ID) after the user
-          accepts cookies — do NOT add hardcoded gtag scripts here. */}
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Reimwelt",
+            "alternateName": ["Reimmaschine", "Reimlexikon online"],
+            "url": SITE_URL,
+            "description": "Kostenlose Reimmaschine und Reimlexikon für deutsche und englische Wörter.",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": `${SITE_URL}/de/reime?q={search_term_string}`
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }) }}
+        />
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
