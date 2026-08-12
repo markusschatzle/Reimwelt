@@ -22,6 +22,7 @@ import ResultsMeta from "../components/ResultsMeta.jsx";
 import EmptyState from "../components/EmptyState.jsx";
 import WordDetailPanel from "../components/WordDetailPanel.jsx";
 import RelatedWords from "../components/RelatedWords.jsx";
+import AdUnit from "../components/AdUnit.jsx";
 
 // ---------------------------------------------------------------------------
 // Lock icons
@@ -358,6 +359,11 @@ export default function ReimePage({
           )
         )}
       </div>
+
+      {/* Ad below results — only when results are visible */}
+      {!loading && displayResults.length > 0 && (
+        <AdUnit slot="2167897672" className="ad-results-bottom" />
+      )}
 
       {/* Synonyms / antonyms of the searched word — internal linking */}
       {!loading && related && (

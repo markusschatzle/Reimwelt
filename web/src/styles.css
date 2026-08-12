@@ -3833,6 +3833,13 @@ html.theme-transitioning *::after {
   color: var(--text-muted);
 }
 
+/* --- AdSense ad units --- */
+.ad-unit {
+  margin: 2rem auto 0;
+  max-width: 760px;
+  width: 100%;
+}
+
 /* --- Related words (synonyms / antonyms) below the search results --- */
 .related-words {
   margin-top: 1.75rem;
