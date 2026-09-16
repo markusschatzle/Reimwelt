@@ -35,3 +35,4 @@ Thumbs.db
 .agents/
 .claude/
 skills-lock.json
+deploy/DEPLOY_STEPS.txt

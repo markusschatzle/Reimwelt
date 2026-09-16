@@ -16,6 +16,9 @@ const nextConfig = {
   // default filesystem cache grew unbounded and filled the VPS (see file).
   cacheHandler: require.resolve("./cache-handler.js"),
   cacheMaxMemorySize: 0,
+  // top-words queries scan the whole lexicon; on a cold DB the default 60 s
+  // kills the build worker and SSG silently falls back to zero word pages.
+  staticPageGenerationTimeout: 300,
   async headers() {
     return [
       {

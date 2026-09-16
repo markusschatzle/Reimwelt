@@ -19,24 +19,24 @@ export function generateStaticParams({ params }) {
 const COPY = {
   rhymes: {
     de: {
-      title: "Reime finden",
+      title: "Reimmaschine & Reimlexikon – Reime finden",
       description:
-        "Gib ein Wort ein und finde phonetisch passende Reime – mit Lautschrift, Metrum und Häufigkeit.",
+        "Kostenlose Reimmaschine: Gib ein Wort ein und finde sofort phonetisch passende Reime. Reimlexikon mit Lautschrift, Metrum und Häufigkeit – für Lyrik, Rap und Gedichte.",
     },
     en: {
-      title: "Find rhymes",
+      title: "Rhyme Finder – Rhyme Dictionary Online",
       description:
-        "Enter a word and find phonetically matching rhymes – with IPA, meter and frequency.",
+        "Free online rhyme finder: enter a word and instantly find phonetically matching rhymes with IPA, meter and frequency. Perfect for poetry, lyrics and songwriting.",
     },
   },
   endings: {
     de: {
-      title: "Wörter nach Endung",
-      description: "Finde alle Wörter mit einer bestimmten Endung.",
+      title: "Wörter nach Endung – Reimlexikon",
+      description: "Finde alle deutschen Wörter mit einer bestimmten Endung – mit Reimen und Aussprache.",
     },
     en: {
-      title: "Words by ending",
-      description: "Find all words sharing a given ending.",
+      title: "Words by ending – Rhyme Dictionary",
+      description: "Find all words sharing a given ending – with rhymes and pronunciation.",
     },
   },
 };

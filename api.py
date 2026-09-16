@@ -126,7 +126,7 @@ def _is_standard_sense(sense: Any) -> bool:
 # ---------------------------------------------------------------------------
 
 @app.post("/api/rhymes")
-async def post_rhymes(req: RhymeRequest) -> dict[str, Any]:
+def post_rhymes(req: RhymeRequest) -> dict[str, Any]:
     # Import here so DATABASE_URL is fully loaded before rhyme_engine
     # initialises its connection pool.
     from rhyme_engine import find_rhymes  # noqa: PLC0415
@@ -173,7 +173,7 @@ LIMIT 1
 """
 
 @app.get("/api/word/{word}")
-async def get_word(word: str, lang: str = Query(..., min_length=2, max_length=10)) -> dict[str, Any]:
+def get_word(word: str, lang: str = Query(..., min_length=2, max_length=10)) -> dict[str, Any]:
     try:
         conn = _word_detail_conn()
     except RuntimeError as exc:
@@ -242,7 +242,7 @@ async def get_word(word: str, lang: str = Query(..., min_length=2, max_length=10
 # ---------------------------------------------------------------------------
 
 @app.post("/api/endings")
-async def post_endings(req: EndingsRequest) -> dict[str, Any]:
+def post_endings(req: EndingsRequest) -> dict[str, Any]:
     # Build the LIKE pattern: suffix search or anywhere search
     suffix_lower = req.suffix.lower()
     if req.anywhere:
@@ -334,7 +334,7 @@ LIMIT %(limit)s
 """
 
 @app.get("/api/top-words/{lang}")
-async def get_top_words(
+def get_top_words(
     lang: str,
     limit: int = Query(1000, ge=1, le=100000),
     pos: str | None = Query(None, description="Comma-separated POS filter"),
@@ -396,7 +396,7 @@ LIMIT %(limit)s
 """
 
 @app.get("/api/top-endings/{lang}")
-async def get_top_endings(
+def get_top_endings(
     lang: str,
     limit: int = Query(200, ge=1, le=5000),
     min_count: int = Query(15, ge=1),

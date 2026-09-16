@@ -31,6 +31,7 @@ import logging
 import math
 import os
 import re
+import threading
 from dataclasses import dataclass, field
 from typing import Any, Generator
 
@@ -64,7 +65,12 @@ DEFAULT_SORT_MODE: str = os.environ.get("DEFAULT_SORT_MODE", "balanced")
 # Connection pool
 # ---------------------------------------------------------------------------
 
+_POOL_MAX = 10
 _pool: psycopg2.pool.ThreadedConnectionPool | None = None
+_pool_lock = threading.Lock()
+# FastAPI runs sync handlers in a 40-thread pool; getconn() raises PoolError
+# instead of waiting when all connections are out, so gate checkouts.
+_pool_slots = threading.BoundedSemaphore(_POOL_MAX)
 
 
 def _get_pool() -> psycopg2.pool.ThreadedConnectionPool:
@@ -79,18 +85,19 @@ def _get_pool() -> psycopg2.pool.ThreadedConnectionPool:
     The module-level ThreadedConnectionPool instance.
     """
     global _pool
-    if _pool is None:
-        if not DATABASE_URL:
-            raise RuntimeError(
-                "DATABASE_URL environment variable is not set.  "
-                "Export it before importing rhyme_engine."
+    with _pool_lock:
+        if _pool is None:
+            if not DATABASE_URL:
+                raise RuntimeError(
+                    "DATABASE_URL environment variable is not set.  "
+                    "Export it before importing rhyme_engine."
+                )
+            _pool = psycopg2.pool.ThreadedConnectionPool(
+                minconn=1,
+                maxconn=_POOL_MAX,
+                dsn=DATABASE_URL,
             )
-        _pool = psycopg2.pool.ThreadedConnectionPool(
-            minconn=1,
-            maxconn=10,
-            dsn=DATABASE_URL,
-        )
-        log.debug("Connection pool created (min=1, max=10).")
+            log.debug("Connection pool created (min=1, max=%d).", _POOL_MAX)
     return _pool
 
 
@@ -108,14 +115,15 @@ def get_db() -> Generator[psycopg2.extensions.connection, None, None]:
                 cur.execute("SELECT 1")
     """
     pool = _get_pool()
-    conn = pool.getconn()
-    try:
-        yield conn
-    except Exception:
-        conn.rollback()
-        raise
-    finally:
-        pool.putconn(conn)
+    with _pool_slots:
+        conn = pool.getconn()
+        try:
+            yield conn
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            pool.putconn(conn)
 
 # ---------------------------------------------------------------------------
 # Phoneme feature vectors
