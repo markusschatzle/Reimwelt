@@ -12,6 +12,10 @@ const INTERNAL_API_URL =
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // ISR pages live in a size-bounded in-memory LRU instead of on disk — the
+  // default filesystem cache grew unbounded and filled the VPS (see file).
+  cacheHandler: require.resolve("./cache-handler.js"),
+  cacheMaxMemorySize: 0,
   async headers() {
     return [
       {
