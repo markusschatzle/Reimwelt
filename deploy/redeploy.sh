@@ -4,9 +4,10 @@
 #
 # Run on the VPS as the user that owns the services (or with sudo):
 #   ./deploy/redeploy.sh            # standard redeploy (git pull + build + restart)
-#   ./deploy/redeploy.sh --clean    # also wipe .next first — use after backend
-#                                   #   data/logic changes that alter EXISTING pages
-#                                   #   (ISR caches fetches for a week otherwise)
+#   ./deploy/redeploy.sh --clean    # also wipe .next first (stops the site during
+#                                   #   the build). Rarely needed: the ISR cache is
+#                                   #   in memory (web/cache-handler.js), so any
+#                                   #   restart already drops stale pages.
 #   ./deploy/redeploy.sh --no-pull  # deploy the current checkout, no git pull
 #
 # Build-time config (NEXT_PUBLIC_SITE_URL, INTERNAL_API_URL, SSG_* …) is read by
@@ -50,7 +51,10 @@ cd web
 echo "▶ npm ci"
 npm ci
 if [ "$CLEAN" = 1 ]; then
-  echo "▶ Clearing .next (ISR + build cache)"
+  # Stop first: a running `next start` without .next crash-loops (ENOENT
+  # prerender-manifest.json) for the whole build. Site is down until restart.
+  echo "▶ Stopping reimwelt-web, clearing .next (build cache)"
+  sudo systemctl stop reimwelt-web
   rm -rf .next
 fi
 echo "▶ npm run build"

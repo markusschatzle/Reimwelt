@@ -18,6 +18,7 @@ from __future__ import annotations
 import dataclasses
 import json
 import os
+import threading
 from typing import Any
 
 import psycopg2
@@ -319,8 +320,12 @@ def post_endings(req: EndingsRequest) -> dict[str, Any]:
 
 _DEFAULT_TOP_POS = ["noun", "verb", "adj", "adv"]
 
+# Rows in frequency order (walks idx_frequency and stops at LIMIT); words are
+# deduped in Python. First occurrence == MAX(frequency_score) per word, so this
+# matches a GROUP BY word ORDER BY max DESC without aggregating the whole
+# language (that took ~20 s and stalled builds/sitemaps).
 _TOP_WORDS_SQL = """
-SELECT word, MAX(frequency_score) AS f
+SELECT word
 FROM words
 WHERE language = %(lang)s
   AND frequency_score > 0
@@ -328,10 +333,50 @@ WHERE language = %(lang)s
   AND is_multiword = FALSE
   AND is_inflected_form = FALSE
   AND pos = ANY(%(pos)s)
-GROUP BY word
-ORDER BY f DESC
-LIMIT %(limit)s
+ORDER BY frequency_score DESC
+LIMIT %(fetch)s
 """
+
+
+# Top lists only change with an ETL run, so cache them for the process
+# lifetime. One lock per key: concurrent build workers wait for the single
+# in-flight query instead of each starting their own.
+_list_cache: dict[tuple, list[str]] = {}
+_list_locks: dict[tuple, threading.Lock] = {}
+_list_locks_guard = threading.Lock()
+
+
+def _cached_list(key: tuple, compute) -> list[str]:
+    if key in _list_cache:
+        return _list_cache[key]
+    with _list_locks_guard:
+        lock = _list_locks.setdefault(key, threading.Lock())
+    with lock:
+        if key not in _list_cache:
+            value = compute()
+            if len(_list_cache) >= 64:  # arbitrary limit/pos combos from crawlers
+                _list_cache.clear()
+            _list_cache[key] = value
+    return _list_cache[key]
+
+
+def _query_top_words(lang: str, pos_list: list[str], limit: int) -> list[str]:
+    conn = _word_detail_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            fetch = limit * 3
+            while True:
+                cur.execute(
+                    _TOP_WORDS_SQL,
+                    {"lang": lang, "pos": pos_list, "fetch": fetch},
+                )
+                rows = cur.fetchall()
+                words = list(dict.fromkeys(r[0] for r in rows))
+                if len(words) >= limit or len(rows) < fetch:
+                    return words[:limit]
+                fetch *= 2
+    finally:
+        conn.close()
 
 @app.get("/api/top-words/{lang}")
 def get_top_words(
@@ -344,24 +389,15 @@ def get_top_words(
     )
 
     try:
-        conn = _word_detail_conn()
+        words = _cached_list(
+            ("words", lang, tuple(pos_list), limit),
+            lambda: _query_top_words(lang, pos_list, limit),
+        )
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
-
-    try:
-        with conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                cur.execute(
-                    _TOP_WORDS_SQL,
-                    {"lang": lang, "pos": pos_list, "limit": limit},
-                )
-                rows = cur.fetchall()
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"DB query failed: {exc}") from exc
-    finally:
-        conn.close()
 
-    words = [row["word"] for row in rows]
     return JSONResponse(
         content={"lang": lang, "count": len(words), "words": words},
         headers={"Cache-Control": "public, max-age=86400"},
@@ -401,25 +437,25 @@ def get_top_endings(
     limit: int = Query(200, ge=1, le=5000),
     min_count: int = Query(15, ge=1),
 ) -> JSONResponse:
-    try:
+    def compute() -> list[str]:
         conn = _word_detail_conn()
-    except RuntimeError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
-
-    try:
-        with conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        try:
+            with conn, conn.cursor() as cur:
                 cur.execute(
                     _TOP_ENDINGS_SQL,
                     {"lang": lang, "min_count": min_count, "limit": limit},
                 )
-                rows = cur.fetchall()
+                return [r[0] for r in cur.fetchall()]
+        finally:
+            conn.close()
+
+    try:
+        endings = _cached_list(("endings", lang, limit, min_count), compute)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"DB query failed: {exc}") from exc
-    finally:
-        conn.close()
 
-    endings = [row["ending"] for row in rows]
     return JSONResponse(
         content={"lang": lang, "count": len(endings), "endings": endings},
         headers={"Cache-Control": "public, max-age=86400"},
